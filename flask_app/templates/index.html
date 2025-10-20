@@ -4,12 +4,12 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title></title>
-    <link rel="stylesheet" href="/static/css/style.css" />
-    <link rel="icon" type="image/svg+xml" href="/static/resources/icon.svg" />
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='resources/Sunapp.png') }}" />
   </head>
   <body>
     <header class="site-header">
-      <img src="/static/resources/Sunapp.png" alt="Logo" class="logo" />
+      <img src="{{ url_for('static', filename='resources/Sunapp.png') }}" alt="Logo" class="logo" />
       <h1>Title Ideas</h1>
       <ul>
         <li>SolarScope</li>
