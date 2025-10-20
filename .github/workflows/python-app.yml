@@ -22,13 +22,12 @@ jobs:
         python-version: "3.10"
     - name: Install dependencies
       run: |
+        python -m venv .venv
+        source .venv/bin/activate
         python -m pip install --upgrade pip
         cd flask_app
         pip install -r requirements.txt
-    - name: Freeze app build
-      run: |
         python flash_app/freeze.py
-
     - name: Upload static build
       uses: actions/upload-pages-artifact@v3
       with:
