@@ -1,7 +1,4 @@
 name: Python application
-permissions:
-  id-token: write
-  contents: read
 
 on:
   push:
@@ -10,6 +7,7 @@ on:
     branches: [ "main" ]
 
 permissions:
+  id-token: write
   contents: read
 
 jobs:
