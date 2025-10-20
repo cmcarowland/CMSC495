@@ -27,11 +27,12 @@ jobs:
         python -m pip install --upgrade pip
         cd flask_app
         pip install -r requirements.txt
-        python flash_app/freeze.py
+        python freeze.py
+        
     - name: Upload static build
       uses: actions/upload-pages-artifact@v3
       with:
-        path: build/
+        path: flask_app/build/
 
   deploy:
     environment:
