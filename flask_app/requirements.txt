@@ -1,3 +1,2 @@
 Flask==2.3.3
-
-# pin any other libs you plan to use here
+Frozen-Flask==1.0.2
