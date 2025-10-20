@@ -27,7 +27,7 @@ jobs:
         pip install -r requirements.txt
     - name: Freeze app build
       run: |
-        python freeze.py
+        python flash_app/freeze.py
 
     - name: Upload static build
       uses: actions/upload-pages-artifact@v3
