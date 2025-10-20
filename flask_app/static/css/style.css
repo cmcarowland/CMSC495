@@ -1,8 +1,8 @@
 :root{
-  --bg: #1d1d1d;
-  --herobg: #2d2d2d;
-  --cardbg: #3d3d3d;
-  --accent: #FFD166;
+  --bg: rgb(28, 28, 28);
+  --herobg: rgb(38, 38, 38);
+  --header-bg: rgb(18, 18, 18);
+  --accent: hsl(42, 100%, 70%);
   --muted: #6b7280;
   --text: #ffffff;
 }
@@ -20,7 +20,7 @@ body{
   align-items:center;
   gap:12px;
   padding:24px;
-  background:linear-gradient(90deg, rgba(255,209,102,0.06), rgba(127,200,255,0.03));
+  background:linear-gradient(90deg, var(--header-bg), rgba(127,200,255,0.03));
 }
 
 .logo{ width:48px; height:48px }
