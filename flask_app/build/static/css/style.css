@@ -1,0 +1,61 @@
+:root{
+  --bg: rgb(28, 28, 28);
+  --herobg: rgb(38, 38, 38);
+  --header-bg: rgb(18, 18, 18);
+  --accent: hsl(42, 100%, 70%);
+  --muted: #6b7280;
+  --text: #ffffff;
+}
+
+body{
+  font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  background: var(--bg);
+  color: var(--text);
+  margin:0;
+  -webkit-font-smoothing:antialiased;
+}
+
+.site-header{
+  display:flex;
+  align-items:center;
+  gap:12px;
+  padding:24px;
+  background:linear-gradient(90deg, var(--header-bg), rgba(127,200,255,0.03));
+}
+
+.logo{ width:48px; height:48px }
+
+.container{ padding:32px }
+
+.hero{ 
+    background:var(--herobg); 
+    padding:24px; 
+    border-radius:12px
+}
+
+form{ 
+    display:flex; 
+    gap:8px; 
+    margin-top:12px; 
+    align-items:center;
+}
+
+input{ 
+    padding:8px 10px;
+    border-radius:8px;
+    border:1px solid #e6edf3 
+}
+
+button{ 
+    background:var(--accent); 
+    border:none;
+    padding:8px 12px; 
+    border-radius:8px; 
+    cursor:pointer 
+}
+
+footer{ 
+    padding:18px; 
+    text-align:center; 
+    color:var(--muted) 
+}
