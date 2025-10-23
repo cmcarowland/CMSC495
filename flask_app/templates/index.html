@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GoldenHour</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='resources/Sunapp.png') }}" />
+  </head>
+  <body>
+    <header class="site-header">
+      <img src="{{ url_for('static', filename='resources/Sunapp.png') }}" alt="Logo" class="logo" />
+      <h1>GoldenHour</h1>
+      <p class="tagline">Plan your outdoor activities by sunrise, sunset, and weather (maybe)</p>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <p>Enter a latitude/longitude and date to get sunrise/sunset times and weather forecasts.</p>
+        <form id="locForm">
+          <label for="lat">Latitude</label>
+          <input id="lat" name="lat" type="text" placeholder="e.g. 38.9072" />
+          <label for="lon">Longitude</label>
+          <input id="lon" name="lon" type="text" placeholder="e.g. -77.0369" />
+          <button type="submit">Lookup</button>
+        </form>
+      </section>
+      <br>
+      <section class="hero">
+        <p>Enter a city and country</p>
+        <form action='/submitCity' id="cityForm" method="post">
+          <label for="city">City</label>
+          <input id="city" name="city" type="text" placeholder="e.g. Buffalo" />
+          <label for="state">State</label>
+          <input id="state" name="state" type="text" placeholder="e.g. NY" />
+          <label for="country">Country</label>
+          <input id="country" name="country" type="text" placeholder="e.g. USA" />
+          <button type="submit">Lookup</button>
+        </form>
+      </section>
+    </main>
+
+    <footer>
+      <small>© 2025 GoldenHour for CMSC495</small>
+    </footer>
+
+    <script>
+      // placeholder for future JavaScript
+      document.getElementById('locForm').addEventListener('submit', function(e){
+        e.preventDefault();
+        alert('Form submitted — we\'ll wire this up soon');
+      });
+    </script>
+  </body>
+</html>
