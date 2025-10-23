@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>GoldenHour</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
+    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='resources/Sunapp.png') }}" />
+  </head>
+  <body>
+    <header class="site-header">
+      <img src="{{ url_for('static', filename='resources/Sunapp.png') }}" alt="Logo" class="logo" />
+      <h1>GoldenHour</h1>
+      <p class="tagline">Plan your outdoor activities by sunrise, sunset, and weather (maybe)</p>
+    </header>
+
+    <main class="container">
+      <section class="hero">
+        <p>Latitude: {{ latitude }}, Longitude: {{ longitude }}</p>
+      </section>
+      <button onclick="window.history.back()">Go Back</button>
+    </main>
+
+    <footer>
+      <small>© 2025 GoldenHour for CMSC495</small>
+    </footer>
+
+    <script></script>
+    </script>
+  </body>
+</html>
