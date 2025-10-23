@@ -3,22 +3,15 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title></title>
+    <title>GoldenHour</title>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
     <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='resources/Sunapp.png') }}" />
   </head>
   <body>
     <header class="site-header">
       <img src="{{ url_for('static', filename='resources/Sunapp.png') }}" alt="Logo" class="logo" />
-      <h1>Title Ideas</h1>
-      <ul>
-        <li>SolarScope</li>
-        <li>DayArc</li>
-        <li>GoldenHour</li>
-        <li>SunPath</li>
-        <li>RayTrack</li>
-      </ul>
-      <p class="tagline">Plan your outdoor activities by sunrise, sunset, and weather.</p>
+      <h1>GoldenHour</h1>
+      <p class="tagline">Plan your outdoor activities by sunrise, sunset, and weather (maybe)</p>
     </header>
 
     <main class="container">
@@ -32,17 +25,77 @@
           <button type="submit">Lookup</button>
         </form>
       </section>
+      <br>
+      <section class="hero">
+        <p>Enter a city and country</p>
+        <form id="cityForm">
+          <label for="city">City</label>
+          <input id="city" name="city" type="text" placeholder="e.g. Buffalo" />
+          <label for="state">State</label>
+          <input id="state" name="state" type="text" placeholder="e.g. NY" />
+          <label for="country">Country</label>
+          <input id="country" name="country" type="text" placeholder="e.g. USA" />
+          <button type="submit">Lookup</button>
+        </form>
+      </section>
     </main>
 
     <footer>
-      <small>© 2025 Some project name for CMSC495</small>
+      <small>© 2025 GoldenHour for CMSC495</small>
     </footer>
 
     <script>
+      const geocodingApiKey = '68f983a560d25300901854lux8717b6';
+
       // placeholder for future JavaScript
       document.getElementById('locForm').addEventListener('submit', function(e){
         e.preventDefault();
         alert('Form submitted — we\'ll wire this up soon');
+      });
+
+      async function getData(city = '', state = '', country = '') {
+        if(!city && !state && !country) {
+          alert('Please enter at least one location parameter.');
+          return;
+        }
+
+        var url = `https://geocode.maps.co/search?`
+        if (city) {url += `city=${city}&`}
+        if (state) {url += `state=${state}&`}
+        if (country) {url += `country=${country}&`}
+        url += `api_key=${geocodingApiKey}`;
+
+        try {
+          const response = await fetch(url);
+          if (!response.ok) {
+            throw new Error(`Response status: ${response.status}`);
+          }
+
+          const result = await response.json();
+          if (result.length > 0) {
+            alert(`Latitude: ${result[0].lat}, Longitude: ${result[0].lon}`);
+          } else {
+            throw new Error('No results found for the given location.');
+          }
+        } catch (error) {
+          alert(error.message);
+        }
+      }
+
+      document.getElementById('cityForm').addEventListener('submit', function(e){
+        e.preventDefault();
+        
+        const form = document.getElementById('cityForm');
+        const formData = new FormData(form);
+        const city = formData.get('city');
+        const state = formData.get('state');
+        const country = formData.get('country');
+
+        if(!city && !state && !country) {
+          alert('Please enter at least one location parameter.');
+          return;
+        }
+        getData(city, state, country);
       });
     </script>
   </body>
