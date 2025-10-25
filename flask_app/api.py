@@ -4,6 +4,7 @@ import os
 
 API_URL = f'http://api.openweathermap.org/'
 GEO_ENDPOINT = 'geo/1.0/direct?q='
+REVERSE_GEO_ENDPOINT = 'geo/1.0/reverse?'
 WEATHER_ENDPOINT = 'data/2.5/weather?'
 OPENMAP_API_KEY = os.environ.get("OPEN_WEATHER_MAP_API_KEY")
 
@@ -47,8 +48,24 @@ def query_weather(latitude, longitude):
         return None
     
     weather_data = response.json()
-    print(weather_data)
+    if weather_data is None:
+        return None
+
     weather_data['sys']['sunrise'] = format_timestamp(weather_data['sys']['sunrise'], weather_data['timezone'])
     weather_data['sys']['sunset'] = format_timestamp(weather_data['sys']['sunset'], weather_data['timezone'])
     
     return weather_data
+
+def get_city_name(latitude, longitude):
+    url = f'{API_URL}{REVERSE_GEO_ENDPOINT}' \
+        f'lat={latitude}&lon={longitude}&limit=1&appid={OPENMAP_API_KEY}'
+
+    response = requests.get(url)
+    if response.status_code != 200:
+        return None
+
+    data = response.json()
+    if data is None or len(data) == 0:
+        return None
+
+    return data[0].get('name', 'Unknown')
