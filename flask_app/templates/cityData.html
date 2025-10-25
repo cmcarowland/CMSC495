@@ -16,16 +16,28 @@
 
     <main class="container">
       <section class="hero">
+        <h3>{{ weather_data.name }}</h3>
         <p>Latitude: {{ latitude }}, Longitude: {{ longitude }}</p>
+        <p>Weather Data:</p>
+        <ul>
+          <li>Temperature: {{ weather_data.main.temp }} °F</li>
+          <li>Weather: {{ weather_data.weather[0].description }}</li>
+          <li>Sunrise: {{ weather_data.sys.sunrise }}</li>
+          <li>Sunset: {{ weather_data.sys.sunset }}</li>
+        </ul>
       </section>
-      <button onclick="window.history.back()">Go Back</button>
+      <button>Go Back</button>
     </main>
 
     <footer>
       <small>© 2025 GoldenHour for CMSC495</small>
     </footer>
 
-    <script></script>
+    <script>
+      document.querySelector('button').addEventListener('click', function() {
+        window.location.href = "{{ url_for('index') }}";
+      });
     </script>
+    
   </body>
 </html>

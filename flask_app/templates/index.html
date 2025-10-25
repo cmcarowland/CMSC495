@@ -17,11 +17,11 @@
     <main class="container">
       <section class="hero">
         <p>Enter a latitude/longitude and date to get sunrise/sunset times and weather forecasts.</p>
-        <form id="locForm">
-          <label for="lat">Latitude</label>
-          <input id="lat" name="lat" type="text" placeholder="e.g. 38.9072" />
-          <label for="lon">Longitude</label>
-          <input id="lon" name="lon" type="text" placeholder="e.g. -77.0369" />
+        <form action='/submitCoord' id="locForm" method="post">
+          <label for="latitude">Latitude</label>
+          <input id="latitude" name="latitude" type="text" placeholder="e.g. 38.9072" />
+          <label for="longitude">Longitude</label>
+          <input id="longitude" name="longitude" type="text" placeholder="e.g. -77.0369" />
           <button type="submit">Lookup</button>
         </form>
       </section>
@@ -45,11 +45,7 @@
     </footer>
 
     <script>
-      // placeholder for future JavaScript
-      document.getElementById('locForm').addEventListener('submit', function(e){
-        e.preventDefault();
-        alert('Form submitted — we\'ll wire this up soon');
-      });
+
     </script>
   </body>
 </html>
