@@ -1,6 +1,6 @@
-# SunTrack Flask App
+# Golden Hour Flask App
 
-Minimal scaffold for the SunTrack sunrise/sunset planner used in the CMSC495 project.
+Minimal scaffold for the Golden Hour sunrise/sunset planner.
 
 Quick start
 
@@ -15,7 +15,7 @@ pip install -r requirements.txt
 2. Run the server:
 
 ```bash
-python app.py
+OPEN_WEATHER_MAP_API_KEY={APIKEY} python app.py
 ```
 
 3. Open http://localhost:5000 in your browser.
@@ -27,5 +27,5 @@ Files
 - `static/css/style.css` - simple styles
 
 Next steps
-- Wire up API endpoints for sunrise/sunset and weather
-- Add unit tests and CI
+- [x] Wire up API endpoints for sunrise/sunset and weather
+- [ ] Add unit tests and CI
