@@ -17,25 +17,25 @@
     <main class="container">
       <section class="hero">
         <p>Enter a latitude/longitude and date to get sunrise/sunset times and weather forecasts.</p>
-        <form action='/submitCoord' id="locForm" method="post">
+        <form action='/submitCoord' id="locForm" method="post" class="form-input-group">
           <label for="latitude">Latitude</label>
           <input id="latitude" name="latitude" type="text" placeholder="e.g. 38.9072" />
           <label for="longitude">Longitude</label>
           <input id="longitude" name="longitude" type="text" placeholder="e.g. -77.0369" />
-          <button type="submit">Lookup</button>
+          <button type="submit" class="form-button">Lookup</button>
         </form>
       </section>
       <br>
       <section class="hero">
         <p>Enter a city and country</p>
-        <form action='/submitCity' id="cityForm" method="post">
+        <form action='/submitCity' id="cityForm" method="post" class="form-input-group">
           <label for="city">City</label>
           <input id="city" name="city" type="text" placeholder="e.g. Buffalo" />
           <label for="state">State</label>
-          <input id="state" name="state" type="text" placeholder="e.g. NY" />
+          <input id="state" name="state" type="text" placeholder="e.g. NY, Not required for non-USA" />
           <label for="country">Country</label>
           <input id="country" name="country" type="text" placeholder="e.g. USA" />
-          <button type="submit">Lookup</button>
+          <button type="submit" class="form-button">Lookup</button>
         </form>
       </section>
     </main>
