@@ -18,12 +18,13 @@
       <section class="hero">
         <h3>{{ weather_data.name }}</h3>
         <p>Latitude: {{ latitude }}, Longitude: {{ longitude }}</p>
+        <img id='weather' src="{{ url_for('static', filename=image_name) }}" alt="Weather icon"></img>
         <p>Weather Data:</p>
         <ul>
           <li>Temperature: {{ weather_data.main.temp }} °F</li>
           <li>Weather: {{ weather_data.weather[0].description }}</li>
-          <li>Sunrise: {{ weather_data.sys.sunrise }}</li>
-          <li>Sunset: {{ weather_data.sys.sunset }}</li>
+          <li>Sunrise: {{ weather_data.sys.sunrise_dt }}</li>
+          <li>Sunset: {{ weather_data.sys.sunset_dt }}</li>
         </ul>
       </section>
       <button>Go Back</button>
