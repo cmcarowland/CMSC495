@@ -51,8 +51,8 @@ def query_weather(latitude, longitude):
     if weather_data is None:
         return None
 
-    weather_data['sys']['sunrise'] = format_timestamp(weather_data['sys']['sunrise'], weather_data['timezone'])
-    weather_data['sys']['sunset'] = format_timestamp(weather_data['sys']['sunset'], weather_data['timezone'])
+    weather_data['sys']['sunrise_dt'] = format_timestamp(weather_data['sys']['sunrise'], weather_data['timezone'])
+    weather_data['sys']['sunset_dt'] = format_timestamp(weather_data['sys']['sunset'], weather_data['timezone'])
     
     return weather_data
 
