@@ -75,3 +75,26 @@ footer{
     text-align:center; 
     color:var(--muted) 
 }
+
+.weather-grid{
+  display:grid;
+  grid-template-columns: 1fr 1fr 1fr;
+  margin-top:12px;
+  text-align: center;
+}
+
+.weather-card{
+  display:grid;
+  grid-template-columns: subgrid;
+  grid-template-rows: 22% 22% 32% 22%;
+  text-align: center;
+  place-items: center;
+  border: white;
+}
+
+.centered{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+}
