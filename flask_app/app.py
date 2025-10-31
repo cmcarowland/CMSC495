@@ -16,7 +16,7 @@ def submit_coord():
     if not longitude and not latitude:
         return render_template('index.html', error="Please provide both longitude and latitude.")
 
-    weather_data = api.query_weather(latitude, longitude)
+    weather_data = api.query_current_weather(latitude, longitude)
     if weather_data is None:
         return render_template('index.html', error="Location not found. Please try again.")
     
@@ -41,14 +41,11 @@ def submit_city():
     longitude = data[0]['lon']
     latitude = data[0]['lat']
     
-    weather_data = api.query_weather(latitude, longitude)
+    weather_data = api.query_hourly_forecast(latitude, longitude)
     if weather_data is None:
         return render_template('index.html', error="Weather data not found. Please try again.")
-    
-    return render_template('cityData.html', 
-                           longitude=longitude, latitude=latitude, 
-                           weather_data=weather_data, 
-                           image_name=f"resources/weather/{get_image_name(weather_data)}.png")
+
+    return render_template('cityData.html', weather_data=weather_data)
 
 def get_image_name(weather_data):
     weather_id = weather_data['weather'][0]['id']
