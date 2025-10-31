@@ -16,15 +16,12 @@
 
     <main class="container">
       <section class="hero">
-        <h3>{{ weather_data.name }}</h3>
-        <p>Latitude: {{ latitude }}, Longitude: {{ longitude }}</p>
-        <img id='weather' src="{{ url_for('static', filename=image_name) }}" alt="Weather icon"></img>
-        <p>Weather Data:</p>
+        <h3>{{ weather_data.city_name }}, {{ weather_data.country }}</h3>
+        <p>Latitude: {{ weather_data.coordinates[0] }}, Longitude: {{ weather_data.coordinates[1] }}</p>
         <ul>
-          <li>Temperature: {{ weather_data.main.temp }} °F</li>
-          <li>Weather: {{ weather_data.weather[0].description }}</li>
-          <li>Sunrise: {{ weather_data.sys.sunrise_dt }}</li>
-          <li>Sunset: {{ weather_data.sys.sunset_dt }}</li>
+        {% for day in weather_data.days %}
+            <li>{{ day.date }}: Sunrise {{ day.sunrise_event.temp }}, Sunset {{ day.sunset_event.temp }}</li>
+        {% endfor %}
         </ul>
       </section>
       <button>Go Back</button>
