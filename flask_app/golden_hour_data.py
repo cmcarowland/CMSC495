@@ -1,8 +1,7 @@
 import datetime
 import math
 
-def lerp(v0, v1, t):
-    return v0 + t * (v1 - v0)
+
 
 class EventData:
     def __init__(self, json_data : dict):
@@ -22,16 +21,20 @@ class EventData:
         if self.visibility >= 5000:
             score += 25
         else:
-            score += lerp(0, 25, self.visibility / 5000)
+            score += EventData.lerp(0, 25, self.visibility / 5000)
 
         if 65 <= self.temp <= 75:
             score += 25
         elif self.temp < 65:
-            score += lerp(0, 25, (self.temp - 30) / (65 - 30))
+            score += EventData.lerp(0, 25, (self.temp - 30) / (65 - 30))
         elif self.temp > 75:
-            score += lerp(0, 25, (100 - self.temp) / (100 - 75))
+            score += EventData.lerp(0, 25, (100 - self.temp) / (100 - 75))
 
         return math.floor(score / 75 * 100)
+
+    @staticmethod
+    def lerp(v0, v1, t):
+        return v0 + t * (v1 - v0)
 
     def get_image_name(self):
         weather_id = self.weather[0]['id']
