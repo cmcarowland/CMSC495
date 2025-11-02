@@ -1,8 +1,6 @@
 import datetime
 import math
 
-
-
 class EventData:
     def __init__(self, json_data : dict):
         self.temp = json_data['main']['temp']
@@ -126,7 +124,7 @@ class GoldenHourData:
         sunrise_hour = self.sunrise - (self.sunrise % 3600)
         sunset_hour = self.sunset - (self.sunset % 3600)
 
-        while len(self.days) < 4:
+        while True:
             sunrise = list(filter(lambda x: x['dt'] == sunrise_hour, json_data['list']))
             if len(sunrise) == 0:
                 sunrise = None
@@ -139,7 +137,10 @@ class GoldenHourData:
                 sunset = None
             else:
                 sunset = sunset[0]
-            
+
+            if sunrise == None and sunset == None and len(self.days) > 0:
+                break
+
             self.days.append(Day(date, self.timezone, sunrise, sunset))
             sunrise_hour += 86400
             sunset_hour += 86400

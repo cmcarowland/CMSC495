@@ -36,7 +36,11 @@
             {% if day.sunrise_event %}
               <p>{{ day.sunrise_event.temp }} &deg;F</p>
               <img width="48" height="48" src="{{ url_for('static', filename='resources/weather/' + day.sunrise_event.get_image_name() + '.png') }}" alt="Weather icon" />
+              {% if day.sunrise_event.calc_golden_score() >= 80 %}
+                <p class="golden">{{ day.sunrise_event.calc_golden_score() }} / 100</p>
+              {% else %}
               <p>{{ day.sunrise_event.calc_golden_score() }} / 100</p>
+              {% endif %}
             {% else %}
               <p>No Temp Data</p>
               <img width="48" height="48" src="{{ url_for('static', filename='resources/weather/n_a.png') }}" alt="Weather icon" />
@@ -48,7 +52,11 @@
             {% if day.sunset_event %}
               <p>{{ day.sunset_event.temp }} &deg;F</p>
               <img width="48" height="48" src="{{ url_for('static', filename='resources/weather/' + day.sunset_event.get_image_name() + '.png') }}" alt="Weather icon" />
+              {% if day.sunset_event.calc_golden_score() >= 80 %}
+                <p class="golden">{{ day.sunset_event.calc_golden_score() }} / 100</p>
+              {% else %}
               <p>{{ day.sunset_event.calc_golden_score() }} / 100</p>
+              {% endif %}
             {% else %}
               <p>No Temp Data</p>
               <img width="48" height="48" src="{{ url_for('static', filename='resources/weather/n_a.png') }}" alt="Weather icon" />
