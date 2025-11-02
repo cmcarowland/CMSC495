@@ -24,6 +24,13 @@ body{
   background:linear-gradient(90deg, var(--header-bg), rgba(127,200,255,0.03));
 }
 
+.mobile-site-header{
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:linear-gradient(90deg, var(--header-bg), rgba(127,200,255,0.03));
+}
+
 .logo{ width:128px; height:128px }
 
 .container{ padding:32px }
@@ -46,6 +53,12 @@ body{
   width: 20%;
 }
 
+@media screen and (min-width: 768px) {
+  .mobile-site-header{
+    display:none;
+  }
+}
+
 @media (max-width: 768px) {
   .form-input-group {
     grid-template-columns: 1fr; /* Stack form groups vertically on smaller screens */
@@ -54,6 +67,10 @@ body{
   .form-button {
     grid-column: span 1;
     width: 100%; /* Make the button full width on mobile */
+  }
+
+  .site-header{
+    display:none;
   }
 }
 
