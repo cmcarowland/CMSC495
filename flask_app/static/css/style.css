@@ -5,6 +5,7 @@
   --accent: hsl(42, 100%, 70%);
   --muted: #6b7280;
   --text: #ffffff;
+  --golden: #efbf04;
 }
 
 body{
@@ -97,4 +98,8 @@ footer{
   justify-content: center;
   align-items: center;
   height: 100%;
+}
+
+.golden {
+  color: var(--golden);
 }

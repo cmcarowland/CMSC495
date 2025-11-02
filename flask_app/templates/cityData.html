@@ -36,9 +36,13 @@
             {% if day.sunrise_event %}
               <p>{{ day.sunrise_event.temp }} &deg;F</p>
               <img width="48" height="48" src="{{ url_for('static', filename='resources/weather/' + day.sunrise_event.get_image_name() + '.png') }}" alt="Weather icon" />
-              <p>{{ day.sunrise_event.calc_golden_score() }} / 100</p>
+              {% if day.sunrise_event.calc_golden_score() >= 80 %}
+                <p class="golden">{{ day.sunrise_event.calc_golden_score() }} / 100</p>
+              {% else %}
+                <p>{{ day.sunrise_event.calc_golden_score() }} / 100</p>
+              {% endif %}
             {% else %}
-              <p>No Temp Data</p>
+              <p>Sunrise already occurred</p>
               <img width="48" height="48" src="{{ url_for('static', filename='resources/weather/n_a.png') }}" alt="Weather icon" />
               <p>0/100</p>
             {% endif %}
@@ -48,11 +52,21 @@
             {% if day.sunset_event %}
               <p>{{ day.sunset_event.temp }} &deg;F</p>
               <img width="48" height="48" src="{{ url_for('static', filename='resources/weather/' + day.sunset_event.get_image_name() + '.png') }}" alt="Weather icon" />
-              <p>{{ day.sunset_event.calc_golden_score() }} / 100</p>
+              {% if day.sunset_event.calc_golden_score() >= 80 %}
+                <p class="golden">{{ day.sunset_event.calc_golden_score() }} / 100</p>
+              {% else %}
+                <p>{{ day.sunset_event.calc_golden_score() }} / 100</p>
+              {% endif %}
             {% else %}
-              <p>No Temp Data</p>
+              {% if day.sunrise_event %}
+                <p>Sunset too far to forecast</p>
+              {% else %}
+                <p>Sunset already occurred</p>
+              {% endif %}
+              
               <img width="48" height="48" src="{{ url_for('static', filename='resources/weather/n_a.png') }}" alt="Weather icon" />
               <p>0/100</p>
+
             {% endif %}
           </div>
         {% endfor %}
