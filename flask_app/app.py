@@ -46,18 +46,21 @@ def submit_city():
     country = request.form.get('country')
 
     if not city and not state and not country:
-        return render_template('index.html', error="Please provide at least one of city, state, or country.")
+        flash('Please provide at least one of city, state, or country.', 'error')
+        return redirect(url_for('index'))
 
     data = api.query_location(city, state, country)
     if data is None:
-        return render_template('index.html', error="Location not found. Please try again.")
+        flash('Location not found. Please try again.', 'error')
+        return redirect(url_for('index'))
     
     longitude = data[0]['lon']
     latitude = data[0]['lat']
     
     weather_data = api.query_hourly_forecast(latitude, longitude)
     if weather_data is None:
-        return render_template('index.html', error="Weather data not found. Please try again.")
+        flash('Weather data not found. Please try again.', 'error')
+        return redirect(url_for('index'))
 
     return render_template('cityData.html', weather_data=weather_data)
 
