@@ -28,7 +28,7 @@ def submit_coord():
     longitude = request.form.get('longitude')
     latitude = request.form.get('latitude')
 
-    if not longitude and not latitude:
+    if not longitude or not latitude:
         flash('Please provide both latitude and longitude.', 'error')
         return redirect( url_for('index'))
 
@@ -46,8 +46,26 @@ def submit_city():
     country = request.form.get('country')
 
     if not city and not state and not country:
-        flash('Please provide at least one of city, state, or country.', 'error')
+        flash('Please provide a city, state (US), and country.', 'error')
         return redirect(url_for('index'))
+
+    if country in ['US', 'USA', 'United States', 'United States of America']:
+        if not state:
+            flash('Please provide a state for US locations.', 'error')
+            return redirect(url_for('index'))
+        elif not city:
+            flash('Please provide a valid city.', 'error')
+            return redirect(url_for('index'))
+    elif not country:
+        if city and state:
+            country = 'US'
+        else:
+            flash('Please provide a country.', 'error')
+            return redirect(url_for('index'))
+    else:
+        if not city:
+            flash('Please provide a valid city.', 'error')
+            return redirect(url_for('index'))
 
     data = api.query_location(city, state, country)
     if data is None:
