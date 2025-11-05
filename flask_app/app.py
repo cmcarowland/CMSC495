@@ -1,7 +1,10 @@
-from flask import Flask, render_template, request
+from flask import Flask, render_template, request, redirect, url_for, flash
 import api
 
+import os
+
 app = Flask(__name__)
+app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
 
 @app.route('/')
 def index():
@@ -14,12 +17,14 @@ def submit_coord():
     latitude = request.form.get('latitude')
 
     if not longitude and not latitude:
-        return render_template('index.html', error="Please provide both longitude and latitude.")
+        flash('Please provide both latitude and longitude.', 'error')
+        return redirect( url_for('index'))
 
     weather_data = api.query_hourly_forecast(latitude, longitude)
     if weather_data is None:
-        return render_template('index.html', error="Location not found. Please try again.")
-    
+        flash('Location not found. Please try again.', 'error')
+        return redirect(url_for('index'))
+
     return render_template('cityData.html', weather_data=weather_data)
 
 @app.route('/submitCity', methods=['POST'])

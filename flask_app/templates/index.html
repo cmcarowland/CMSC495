@@ -16,7 +16,7 @@
 
     <header class="mobile-site-header">
       <img src="{{ url_for('static', filename='resources/Sunapp.png') }}" alt="Logo" class="logo" />
-    </header>
+    </header>  
 
     <main class="container">
       <section class="hero">
@@ -46,11 +46,36 @@
       </section>
     </main>
 
+    <dialog id="error">
+      <p id="dialogMessage"></p>
+      <button autofocus>Close</button>
+    </dialog>
+
     <footer>
       <small>© 2025 GoldenHour for CMSC495</small>
     </footer>
 
     <script>
+      const dialog = document.querySelector('dialog');
+      const closeButton = dialog ? dialog.querySelector('button') : null;
+
+      const flashedMessages = {{ get_flashed_messages(with_categories=true) | tojson }};
+
+        // You can now loop through the messages in JavaScript
+        if (flashedMessages.length > 0) {
+            for (const [category, message] of flashedMessages) {
+                if (category === 'error') {
+                    // For example, display a JavaScript alert
+                    document.getElementById("dialogMessage").innerText = message;
+                    dialog.showModal();
+                }
+            }
+        }
+
+      closeButton?.addEventListener('click', () => {
+        dialog.close();
+      });
+
       function showPosition(position) {
         document.getElementById("latitude").value = position.coords.latitude;
         document.getElementById("longitude").value = position.coords.longitude;
