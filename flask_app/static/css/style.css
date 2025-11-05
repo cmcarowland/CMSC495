@@ -1,3 +1,14 @@
+/*
+Golden Hour App Group 1
+UMGC CMSC 495 7385
+Shivam Patel, Raymond Rowland, Mariam Ahmed, Katrina Wilhelm, Paul Cooper
+November 5, 2025
+
+style.css
+
+The stylesheet for the Golden Hour Flask application.
+Defines color variables and styles for layout and responsiveness.
+*/
 :root{
   --bg: rgb(28, 28, 28);
   --herobg: rgb(38, 38, 38);

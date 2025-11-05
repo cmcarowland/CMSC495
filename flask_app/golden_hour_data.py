@@ -1,3 +1,15 @@
+'''
+Golden Hour App Group 1
+UMGC CMSC 495 7385
+Shivam Patel, Raymond Rowland, Mariam Ahmed, Katrina Wilhelm, Paul Cooper
+November 5, 2025
+
+golden_hour_data.py
+
+Defines data structures for Golden Hour weather data processing.
+Contains classes: GoldenHourData, Day, EventData.
+'''
+
 import datetime
 import math
 
