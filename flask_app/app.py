@@ -1,10 +1,22 @@
+'''
+Golden Hour App Group 1
+UMGC CMSC 495 7385
+Shivam Patel, Raymond Rowland, Mariam Ahmed, Katrina Wilhelm, Paul Cooper
+November 5, 2025
+
+app.py
+
+Handles Flask application routes and rendering templates.
+/submitCoord and /submitCity routes process user input and fetch weather data.
+'''
+
 from flask import Flask, render_template, request, redirect, url_for, flash
 import api
 
 import os
 
 app = Flask(__name__)
-app.secret_key = b'_5#y2L"F4Q8z\n\xec]/'
+app.secret_key = os.environ.get("OPEN_WEATHER_MAP_API_KEY")
 
 @app.route('/')
 def index():
