@@ -89,3 +89,5 @@ def create_app():
         return query_hourly_forecast(latitude, longitude)
 
     return app
+
+app_instance = create_app()
