@@ -33,3 +33,11 @@ def test_city_data(client_dummy):
     })
     assert response.status_code == 200
     assert b'Los Angeles, US' in response.data
+
+def test_coord_data(client_dummy):
+    response = client_dummy.post('/submitCoord', data={
+        'latitude': '38.9',
+        'longitude': '-77.1'
+    })
+    assert response.status_code == 200
+    assert b'Arlington, US' in response.data
