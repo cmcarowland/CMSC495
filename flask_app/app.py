@@ -23,6 +23,18 @@ def index():
     # renders templates/index.html
     return render_template('index.html')
 
+def query_hourly_forecast(latitude, longitude):
+    '''
+    Queries the API for hourly weather data.
+    '''
+
+    weather_data = api.query_hourly_forecast(latitude, longitude)
+    if weather_data is None:
+        flash('Location not found. Please try again.', 'error')
+        return redirect(url_for('index'))
+
+    return render_template('cityData.html', weather_data=weather_data)
+
 @app.route('/submitCoord', methods=['POST'])
 def submit_coord():
     longitude = request.form.get('longitude')
@@ -31,13 +43,9 @@ def submit_coord():
     if not longitude or not latitude:
         flash('Please provide both latitude and longitude.', 'error')
         return redirect( url_for('index'))
+    
+    return query_hourly_forecast(latitude, longitude)
 
-    weather_data = api.query_hourly_forecast(latitude, longitude)
-    if weather_data is None:
-        flash('Location not found. Please try again.', 'error')
-        return redirect(url_for('index'))
-
-    return render_template('cityData.html', weather_data=weather_data)
 
 @app.route('/submitCity', methods=['POST'])
 def submit_city():
@@ -74,13 +82,8 @@ def submit_city():
     
     longitude = data[0]['lon']
     latitude = data[0]['lat']
-    
-    weather_data = api.query_hourly_forecast(latitude, longitude)
-    if weather_data is None:
-        flash('Weather data not found. Please try again.', 'error')
-        return redirect(url_for('index'))
 
-    return render_template('cityData.html', weather_data=weather_data)
+    return query_hourly_forecast(latitude, longitude)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000, debug=True)
