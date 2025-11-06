@@ -108,4 +108,14 @@ def test_outside_us(client_dummy):
     })
     assert response.status_code == 200
     assert b'Skopje, MK' in response.data
-    
+
+def test_no_coordinates_information(client_dummy):
+    response = client_dummy.post('/submitCoord', data={
+        'latitude': '',
+        'longitude': ''
+    })
+    assert response.status_code == 302
+    assert b'<title>Redirecting...</title>' in response.data
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Please provide both latitude and longitude.' in msg for category, msg in flashed_messages if category == 'error')
