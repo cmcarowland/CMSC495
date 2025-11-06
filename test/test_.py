@@ -99,3 +99,13 @@ def test_no_country_outside_us(client_dummy):
     with client_dummy.session_transaction() as session:
         flashed_messages = session['_flashes']
         assert any('Please provide a country.' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_outside_us(client_dummy):
+    response = client_dummy.post('/submitCity', data={
+        'city': 'Skopje',
+        'state': '',
+        'country': 'MK'
+    })
+    assert response.status_code == 200
+    assert b'Skopje, MK' in response.data
+    
