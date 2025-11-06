@@ -41,3 +41,16 @@ def test_coord_data(client_dummy):
     })
     assert response.status_code == 200
     assert b'Arlington, US' in response.data
+
+
+def test_no_location_information(client_dummy):
+    response = client_dummy.post('/submitCity', data={
+        'city': '',
+        'state': '',
+        'country': ''
+    })
+    assert response.status_code == 302
+    assert b'<title>Redirecting...</title>' in response.data
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Please provide a city, state (US), and country.' in msg for category, msg in flashed_messages if category == 'error')
