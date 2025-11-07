@@ -1,21 +1,29 @@
 # Goldenhour
 
-<img src="images/Webdesign.png" />
-
-### Executive Summary: Brief overview of the project, and its objectives
+<img src="flask_app/static/resources/Sunapp.png" width="256" />
 
 Many people, such as outdoor enthusiasts and photographers, need accurate information about sunrise and sunset times to plan activities accordingly.  Currently, accessing this information often requires searching multiple apps and can often lead to inaccurate information. The goal of this project is to create a user-friendly sun rise/set time tracker that provides precise daily times for any chosen location. This project will be used by hikers, campers and photographers.
 
-### Project Overview: A detailed description of the project, its scope, and the problem it addresses.
+## Project Setup and Run
+See [Flask App](flask_app/README.md)
+
+## Main Features
+- Geobased queries
+- Location based queries 
+- Get Geolocation for the device using browser API's
+
+### Coordinate Based Query
+<img src="images/Geolocation.png">
+
+<img src="images/GeoResults.png">
 
 
-### Project Goals and Objectives: Clearly defined project goals, objectives, and deliverables.
+### Location Based Query
+<img src="images/LocationQuery.png">
 
+<img src="images/LocationResult.png">
 
-### Project Scope: Define the boundaries and limitations of the project, including what is included and excluded.
+### Error State
+<img src="images/ErrorGeo.png">
 
-
-### Project Resources: Identify and allocate the necessary resources for the project, including personnel, equipment, and budget.
-
-
-### Communication Plan: Define the communication channels, frequency, and responsibilities for project updates and collaboration.
+<img src="images/ErrorLocation.png">
