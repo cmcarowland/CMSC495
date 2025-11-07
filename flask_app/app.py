@@ -85,7 +85,7 @@ def create_app():
         
         longitude = data[0]['lon']
         latitude = data[0]['lat']
-
+        
         return query_hourly_forecast(latitude, longitude)
 
     return app
