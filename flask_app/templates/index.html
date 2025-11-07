@@ -72,17 +72,14 @@ Landing page for user to input city/country or latitude/longitude coordinates.
       const closeButton = dialog ? dialog.querySelector('button') : null;
 
       const flashedMessages = {{ get_flashed_messages(with_categories=true) | tojson }};
-
-        // You can now loop through the messages in JavaScript
-        if (flashedMessages.length > 0) {
-            for (const [category, message] of flashedMessages) {
-                if (category === 'error') {
-                    // For example, display a JavaScript alert
-                    document.getElementById("dialogMessage").innerText = message;
-                    dialog.showModal();
-                }
-            }
-        }
+      if (flashedMessages.length > 0) {
+          for (const [category, message] of flashedMessages) {
+              if (category === 'error') {
+                  document.getElementById("dialogMessage").innerText = message;
+                  dialog.showModal();
+              }
+          }
+      }
 
       closeButton?.addEventListener('click', () => {
         dialog.close();

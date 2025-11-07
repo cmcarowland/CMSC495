@@ -11,7 +11,7 @@ Defines functions to query location and weather data.
 Creates GoldenHourData objects from API responses.
 '''
 
-from golden_hour_data import GoldenHourData, Day, EventData
+from flask_app.golden_hour_data import GoldenHourData
 
 import requests
 import datetime
