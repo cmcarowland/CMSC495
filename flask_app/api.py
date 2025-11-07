@@ -102,7 +102,6 @@ def query_hourly_forecast(latitude, longitude):
     if response.status_code != 200:
         return None
     
-    # print(response.json())
     ghd = GoldenHourData(response.json())
     
     return ghd

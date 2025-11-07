@@ -17,7 +17,7 @@ class EventData:
     def __init__(self, json_data : dict):
         self.temp = json_data['main']['temp']
         self.weather = json_data['weather']
-        self.visibility = json_data['visibility']
+        self.visibility = json_data.get('visibility', 10000)
 
     def calc_golden_score(self):
         score = 0
