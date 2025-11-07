@@ -1,4 +1,17 @@
-from golden_hour_data import GoldenHourData, Day, EventData
+'''
+Golden Hour App Group 1
+UMGC CMSC 495 7385
+Shivam Patel, Raymond Rowland, Mariam Ahmed, Katrina Wilhelm, Paul Cooper
+November 5, 2025
+
+api.py
+
+Handles API interactions with OpenWeatherMap.
+Defines functions to query location and weather data.
+Creates GoldenHourData objects from API responses.
+'''
+
+from flask_app.golden_hour_data import GoldenHourData
 
 import requests
 import datetime
