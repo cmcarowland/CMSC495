@@ -119,3 +119,25 @@ def test_no_coordinates_information(client_dummy):
     with client_dummy.session_transaction() as session:
         flashed_messages = session['_flashes']
         assert any('Please provide both latitude and longitude.' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_no_longitude_information(client_dummy):
+    response = client_dummy.post('/submitCoord', data={
+        'latitude': '38.9',
+        'longitude': ''
+    })
+    assert response.status_code == 302
+    assert b'<title>Redirecting...</title>' in response.data
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Please provide both latitude and longitude.' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_no_latitude_information(client_dummy):
+    response = client_dummy.post('/submitCoord', data={
+        'latitude': '',
+        'longitude': '-77'
+    })
+    assert response.status_code == 302
+    assert b'<title>Redirecting...</title>' in response.data
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Please provide both latitude and longitude.' in msg for category, msg in flashed_messages if category == 'error')
