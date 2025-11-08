@@ -141,3 +141,28 @@ def test_no_latitude_information(client_dummy):
     with client_dummy.session_transaction() as session:
         flashed_messages = session['_flashes']
         assert any('Please provide both latitude and longitude.' in msg for category, msg in flashed_messages if category == 'error')
+
+
+def test_invalid_location(client_dummy):
+    response = client_dummy.post('/submitCity', data={
+        'city': 'ThisCityDoesNotExist',
+        'state': 'ZZ',
+        'country': 'US'
+    })
+    assert response.status_code == 302
+    assert b'<title>Redirecting...</title>' in response.data
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Location not found. Please try again.' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_null_city_with_nonus_country(client_dummy):
+    response = client_dummy.post('/submitCity', data={
+        'city': '',
+        'state': '',
+        'country': 'GB'
+    })
+    assert response.status_code == 302
+    assert b'<title>Redirecting...</title>' in response.data
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Please provide a valid city.' in msg for category, msg in flashed_messages if category == 'error')
