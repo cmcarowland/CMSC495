@@ -50,21 +50,6 @@ def query_location(city, state, country):
 
     return data
 
-def format_timestamp(timestamp, timezone_offset):
-    '''
-    Convert a UTC timestamp to local time based on timezone offset.
-    Returns formatted time string "HH:MM:SS".
-    '''
-
-    local_timezone = datetime.timezone(datetime.timedelta(seconds=timezone_offset))
-
-    utc_dt = datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
-    local_dt = utc_dt.astimezone(local_timezone)
-    
-    formatted_time = local_dt.strftime("%H:%M:%S")
-
-    return formatted_time
-
 def query_current_weather(latitude, longitude):
     '''
     Query current weather data from OpenWeatherMap API.
@@ -83,9 +68,6 @@ def query_current_weather(latitude, longitude):
     if weather_data is None:
         return None
 
-    weather_data['sys']['sunrise_dt'] = format_timestamp(weather_data['sys']['sunrise'], weather_data['timezone'])
-    weather_data['sys']['sunset_dt'] = format_timestamp(weather_data['sys']['sunset'], weather_data['timezone'])
-    
     return weather_data
 
 def query_hourly_forecast(latitude, longitude):
