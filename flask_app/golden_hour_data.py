@@ -36,9 +36,9 @@ class EventData:
         if 65 <= self.temp <= 75:
             score += 25
         elif self.temp < 65:
-            score += EventData.lerp(0, 25, (self.temp - 30) / (65 - 30))
+            score += EventData.lerp(0, 25, (self.temp - 40) / 25)
         elif self.temp > 75:
-            score += EventData.lerp(0, 25, (100 - self.temp) / (100 - 75))
+            score += EventData.lerp(0, 25, (100 - self.temp) / 25)
 
         return math.floor(score / 75 * 100)
 
@@ -95,7 +95,7 @@ class EventData:
 
 class Day:
     def __init__(self, date : int, timezone : int, sunrise_data: dict, sunset_data: dict):
-        self.date = self.format_timestamp(date, timezone)
+        self.date = self.format_timestamp_as_M_D_Y(date, timezone)
         self.sunrise_event = None
         self.sunset_event = None
     
@@ -105,10 +105,10 @@ class Day:
         if sunset_data != None:
             self.sunset_event = EventData(sunset_data)
 
-    def format_timestamp(self, timestamp, timezone_offset):
+    def format_timestamp_as_M_D_Y(self, timestamp, timezone_offset):
         '''
         Convert a UTC timestamp to local time based on timezone offset.
-        Returns formatted time string "HH:MM:SS".
+        Returns formatted date string "MM/DD/YYYY".
         '''
 
         local_timezone = datetime.timezone(datetime.timedelta(seconds=timezone_offset))
@@ -128,8 +128,8 @@ class GoldenHourData:
         self.timezone = json_data['city']['timezone']
         self.sunrise = json_data['city']['sunrise']
         self.sunset = json_data['city']['sunset']
-        self.sunrise_dt = self.format_timestamp(self.sunrise)
-        self.sunset_dt = self.format_timestamp(self.sunset)
+        self.sunrise_dt = self.format_timestamp_as_H_M_S(self.sunrise)
+        self.sunset_dt = self.format_timestamp_as_H_M_S(self.sunset)
         self.days = []
 
         date = json_data['list'][0]['dt']
@@ -143,7 +143,6 @@ class GoldenHourData:
             else:
                 sunrise = sunrise[0]
             
-
             sunset = list(filter(lambda x: x['dt'] == sunset_hour, json_data['list']))
             if len(sunset) == 0:
                 sunset = None
@@ -158,7 +157,7 @@ class GoldenHourData:
             sunset_hour += 86400
             date += 86400
 
-    def format_timestamp(self, timestamp):
+    def format_timestamp_as_H_M_S(self, timestamp):
         '''
         Convert a UTC timestamp to local time based on timezone offset.
         Returns formatted time string "HH:MM:SS".
