@@ -166,3 +166,14 @@ def test_null_city_with_nonus_country(client_dummy):
     with client_dummy.session_transaction() as session:
         flashed_messages = session['_flashes']
         assert any('Please provide a valid city.' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_bad_latitude_information(client_dummy):
+    response = client_dummy.post('/submitCoord', data={
+        'latitude': '625',
+        'longitude': '-77'
+    })
+    assert response.status_code == 302
+    assert b'<title>Redirecting...</title>' in response.data
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Location not found. Please try again.' in msg for category, msg in flashed_messages if category == 'error')
