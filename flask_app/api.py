@@ -24,7 +24,7 @@ GEO_ENDPOINT = 'geo/1.0/direct?q='
 REVERSE_GEO_ENDPOINT = 'geo/1.0/reverse?'
 WEATHER_ENDPOINT = 'data/2.5/weather?'
 HOURLY_ENDPOINT = 'data/2.5/forecast/hourly?'
-HISTORY_ENDPOINT = 'data/2.5/history/city?lat=41.85&lon=-87&type=hour&start=1762853316&cnt=1&units=imperial'
+HISTORY_ENDPOINT = 'data/2.5/history/city?cnt=1&units=imperial&type=hour&start='
 OPENMAP_API_KEY = os.environ.get("OPEN_WEATHER_MAP_API_KEY")
 
 def query_location(city, state, country):
@@ -97,16 +97,18 @@ def query_historical_forecast(latitude, longitude, unix_time):
     '''
 
     url = f'{HISTORY_URL}{HISTORY_ENDPOINT}' \
-        f'lat={latitude}&lon={longitude}&start={unix_time}&cnt=1' \
-        f'&units=Imperial&appid={OPENMAP_API_KEY}'
-    
+        f'{unix_time}&lat={latitude}&lon={longitude}' \
+        f'&appid={OPENMAP_API_KEY}'
+
     response = requests.get(url)
     if response.status_code != 200:
         return None
-    
-    ghd = GoldenHourData(response.json())
-    
-    return ghd
+
+    data = response.json()
+    if data.get('list') is None:
+        return None
+
+    return data['list'][0]
 
 def get_city_name(latitude, longitude):
     '''
