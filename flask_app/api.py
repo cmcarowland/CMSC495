@@ -19,10 +19,12 @@ import os
 
 API_URL = f'http://api.openweathermap.org/'
 PRO_URL = 'https://pro.openweathermap.org/'
+HISTORY_URL = 'https://history.openweathermap.org/'
 GEO_ENDPOINT = 'geo/1.0/direct?q='
 REVERSE_GEO_ENDPOINT = 'geo/1.0/reverse?'
 WEATHER_ENDPOINT = 'data/2.5/weather?'
 HOURLY_ENDPOINT = 'data/2.5/forecast/hourly?'
+HISTORY_ENDPOINT = 'data/2.5/history/city?lat=41.85&lon=-87&type=hour&start=1762853316&cnt=1&units=imperial'
 OPENMAP_API_KEY = os.environ.get("OPEN_WEATHER_MAP_API_KEY")
 
 def query_location(city, state, country):
@@ -79,6 +81,24 @@ def query_hourly_forecast(latitude, longitude):
     url = f'{PRO_URL}{HOURLY_ENDPOINT}' \
         f'lat={latitude}&lon={longitude}&units=Imperial' \
         f'&appid={OPENMAP_API_KEY}'
+    
+    response = requests.get(url)
+    if response.status_code != 200:
+        return None
+    
+    ghd = GoldenHourData(response.json())
+    
+    return ghd
+
+def query_historical_forecast(latitude, longitude, unix_time):
+    '''
+    Query historical weather forecast for the specified time.
+    Returns a dictionary with forecast data or None if not found.
+    '''
+
+    url = f'{HISTORY_URL}{HISTORY_ENDPOINT}' \
+        f'lat={latitude}&lon={longitude}&start={unix_time}&cnt=1' \
+        f'&units=Imperial&appid={OPENMAP_API_KEY}'
     
     response = requests.get(url)
     if response.status_code != 200:
