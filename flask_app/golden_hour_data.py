@@ -10,6 +10,8 @@ Defines data structures for Golden Hour weather data processing.
 Contains classes: GoldenHourData, Day, EventData.
 '''
 
+from flask_app import api
+
 import datetime
 import math
 
@@ -217,16 +219,23 @@ class GoldenHourData:
 
         while True:
             sunrise = list(filter(lambda x: x['dt'] == sunrise_hour, json_data['list']))
-            if len(sunrise) == 0:
-                sunrise = None
-            else:
+            if sunrise_hour < datetime.datetime.now().timestamp() and len(sunrise) == 0:
+                data = api.query_historical_forecast(self.coordinates[0], self.coordinates[1], sunrise_hour)
+                sunrise = data
+            elif len(sunrise) > 0:
                 sunrise = sunrise[0]
+            else:
+                sunrise = None
             
             sunset = list(filter(lambda x: x['dt'] == sunset_hour, json_data['list']))
-            if len(sunset) == 0:
-                sunset = None
-            else:
+
+            if sunset_hour < datetime.datetime.now().timestamp() and len(sunset) == 0:
+                data = api.query_historical_forecast(self.coordinates[0], self.coordinates[1], sunset_hour)
+                sunset = data
+            elif len(sunset) > 0:
                 sunset = sunset[0]
+            else:
+                sunset = None
 
             if sunrise == None and sunset == None and len(self.days) > 0:
                 break
