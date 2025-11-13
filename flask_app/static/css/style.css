@@ -18,6 +18,8 @@ Defines color variables and styles for layout and responsiveness.
   --text: #ffffff;
   --golden: #efbf04;
   --error-bg: rgb(64, 0, 0);
+  --login-bg: rgb(85, 85, 85);
+  --input-border: #e6edf3;
 }
 
 body{
@@ -89,7 +91,7 @@ body{
 input{ 
     padding:8px 10px;
     border-radius:8px;
-    border:1px solid #e6edf3 
+    border:1px solid var(--input-border);
 }
 
 button{ 
@@ -133,7 +135,7 @@ footer{
   color: var(--golden);
 }
 
-.dlalog-window {
+.error-dialog {
   position: fixed;
   box-sizing: border-box;
   inset: 0;
@@ -146,6 +148,55 @@ footer{
   justify-content: center;
 }
 
+.login-dialog {
+  position: fixed;
+  box-sizing: border-box;
+  inset: 0;
+  align-items: center;
+  padding: 16px;
+  background-color: var(--login-bg);
+  color: var(--text);
+  border-radius: 10px;
+  text-align: center;
+  justify-content: center;
+}
+
 dialog::backdrop {
   background: rgba(0, 0, 0, 0.5);
+}
+
+.tab {
+  display: flex;
+  justify-content: center;
+  gap: 20px;
+  overflow: hidden;
+  border: 1px solid var(--input-border);
+  background-color: var(--header-bg);
+  padding: 2px;
+}
+
+.tab button {
+  float: left;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 17px;
+  color: var(--text);
+  background-color: var(--hero-bg);
+}
+
+.tab button:hover {
+  background-color: var(--login-bg);
+}
+
+.tab button.active {
+  background-color: var(--accent);
+}
+
+.tabcontent {
+  display:grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 5px;
+  padding-top: 5px;
 }
