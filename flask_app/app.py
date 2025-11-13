@@ -51,8 +51,9 @@ def create_app():
 
     @app.route('/')
     def index():
-        # renders templates/index.html
-        return render_template('index.html')
+        c = request.cookies.get('auth')
+        user = users_instance.authenticated.get(c)
+        return render_template('index.html', user=user)
 
     def query_hourly_forecast(latitude, longitude):
         '''
@@ -121,23 +122,23 @@ def create_app():
         data = json.loads(auth)        
         user_name, pw_hash = base64.b64decode(data['auth']).decode('utf-8').split(':')
 
-        if users_instance.login(user_name=user_name, pw=pw_hash):
-            c = cookie()
-            resp = make_response(redirect(url_for('index')), 200)
-            resp.set_cookie('auth', c)
-            user = users_instance.get_user(user_name)
-            if user:
+        user = users_instance.get_user(user_name)
+        if user: 
+            if users_instance.login(user_name=user_name, pw=pw_hash):
+                c = cookie()
+                resp = make_response(redirect(url_for('index')), 200)
+                resp.set_cookie('auth', c)
                 user.last_login = str(datetime.now(timezone.utc))
                 users_instance.authenticated[c] = user
                 return resp
             else:
-                flash('Login failed. User not found.', 'error')
+                flash('Login failed. Please check your username and password.', 'error')
                 return redirect(url_for('index'), code=401)
-            
+ 
         else:
-            flash('Login failed. Please check your username and password.', 'error')
+            flash('Login failed. User not found.', 'error')
             return redirect(url_for('index'), code=401)
-   
+            
     @app.route('/signup', methods=['POST'])
     def signup():
         user = None
