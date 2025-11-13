@@ -24,6 +24,11 @@ Landing page for user to input city/country or latitude/longitude coordinates.
       <img src="{{ url_for('static', filename='resources/Sunapp.png') }}" alt="Logo" class="logo" />
       <h1>GoldenHour</h1>
       <p class="tagline">Plan your outdoor activities by sunrise, sunset, and weather</p>
+      {% if not request.cookies.get('auth') %}
+        <button type="button" id="loginBtn" onclick="document.getElementById('loginDialog').showModal();">Login/Signup</button>
+      {% else %}
+        <button type="button" onclick="logUserOut()">Logout</button>
+      {% endif %}
     </header>
 
     <header class="mobile-site-header">
@@ -58,7 +63,7 @@ Landing page for user to input city/country or latitude/longitude coordinates.
       </section>
     </main>
 
-    <dialog class="error-dialog">
+    <dialog id="errorDialog" class="error-dialog">
       <p id="dialogMessage"></p>
       <button autofocus>Close</button>
     </dialog>
@@ -69,22 +74,22 @@ Landing page for user to input city/country or latitude/longitude coordinates.
         <button class="tablinks" onclick="changeTab(event, 'signupTab')">Signup</button>
       </div>
       <div id="loginTab" class="tabcontent">
-        <label for="uname">Username </label>
-        <input type="text" id="uname" name="uname">
+        <label for="unameLogin">Username </label>
+        <input type="text" id="unameLogin" name="uname">
         <label for="pword">Password </label>
-        <input type="password" id="pword" name="pword">
-        <button id="submitLogin">Submit</button>
-        <button id="closeLogin" onclick="closeLoginDialog()">Close</button>
+        <input type="password" id="pwordLogin" name="pword">
+        <button onclick="logintoServer()">Submit</button>
+        <button onclick="closeLoginDialog()">Close</button>
       </div>
       <div id="signupTab" class="tabcontent">
-        <label for="uname">Username </label>
-        <input type="text" id="uname" name="uname">
-        <label for="pword">Password </label>
-        <input type="password" id="pword" name="pword">
+        <label for="unameSignup">Username </label>
+        <input type="text" id="unameSignup" name="uname">
+        <label for="pwordSignup">Password </label>
+        <input type="password" id="pwordSignup" name="pword">
         <label for="pword_confirm">Confirm Password </label>
         <input type="password" id="pword_confirm" name="pword_confirm">
-        <button id="submitLogin">Submit</button>
-        <button id="closeLogin" onclick="closeLoginDialog()">Close</button>
+        <button>Submit</button>
+        <button onclick="closeLoginDialog()">Close</button>
       </div>
     </dialog>
 
@@ -94,14 +99,12 @@ Landing page for user to input city/country or latitude/longitude coordinates.
 
     <script>
       const login = document.querySelector('#loginDialog');
-      login.showModal();
 
       function closeLoginDialog() {
-        console.log("Closing login dialog");
         login.close();
       }
 
-      const dialog = document.querySelector('dialog');
+      const dialog = document.querySelector('#errorDialog');
       const closeButton = dialog ? dialog.querySelector('button') : null;
 
       const flashedMessages = {{ get_flashed_messages(with_categories=true) | tojson }};
@@ -163,14 +166,70 @@ Landing page for user to input city/country or latitude/longitude coordinates.
         var i, tabcontent, tablinks;
         tabcontent = document.getElementsByClassName("tabcontent");
         for (i = 0; i < tabcontent.length; i++) {
+          if (tabcontent[i].id === "loginBase") {
+            continue;
+          }
+
           tabcontent[i].style.display = "none";
         }
+
         tablinks = document.getElementsByClassName("tablinks");
         for (i = 0; i < tablinks.length; i++) {
+          if (tabcontent[i].id === "loginBase") {
+            continue;
+          }
+
           tablinks[i].className = tablinks[i].className.replace(" active", "");
         }
+
         document.getElementById(tabName).style.display = "grid";
         evt.currentTarget.className += " active";
+      }
+
+      function logUserOut() {
+        fetch('/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        }).then(() => {
+          window.location.reload();
+        }).catch((err) => {
+          alert('Network error: ' + err.message);
+        });
+      }
+
+      async function logintoServer(evt) {
+        const username = document.getElementById("unameLogin").value;
+        if (!username) {
+          alert("Username cannot be empty");
+          return;
+        }
+        
+        const password = document.getElementById("pwordLogin").value;
+        if (!password) {
+          alert("Password cannot be empty");
+          return;
+        }
+
+        const combined = username + ":" + await hash(password);
+        const b64encoded = btoa(combined);
+        try {
+          const resp = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ auth: b64encoded })
+          });
+
+          // on success, close dialog and navigate / refresh
+          login.close();
+          const data = await resp.json().catch(() => null);
+          if (data && data.redirect) {
+            window.location.href = data.redirect;
+          } else {
+            window.location.reload();
+          }
+        } catch (err) {
+          alert('Network error: ' + err.message);
+        }
       }
 
       document.addEventListener("DOMContentLoaded", function() {
