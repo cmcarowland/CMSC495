@@ -167,7 +167,7 @@ dialog::backdrop {
 
 .tab {
   display: flex;
-  justify-content: center;
+  justify-content: space-evenly;
   gap: 20px;
   overflow: hidden;
   border: 1px solid var(--input-border);
