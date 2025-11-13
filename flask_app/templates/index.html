@@ -32,11 +32,30 @@ Landing page for user to input city/country or latitude/longitude coordinates.
     
     <main class="container">
       <section class="hero">
-        {% if not request.cookies.get('auth') %}
+        {% if not user %}
           <button type="button" id="loginBtn" onclick="document.getElementById('loginDialog').showModal();">Login/Signup</button>
         {% else %}
           <label>Welcome, {{ get_auth_user_name(request) }}</label>
+          <br>
           <button type="button" onclick="logUserOut()">Logout</button>
+          <div> 
+            <h2>Favorite Locations</h2>
+            {% if user.favorite_locations %}
+              <ul>
+                {% for loc in user.favorite_locations %}
+                  <li>
+                    <form action='/submitCoord' method='post' style='display:inline;'>
+                      <input type='hidden' name='latitude' value='{{ loc.latitude }}' />
+                      <input type='hidden' name='longitude' value='{{ loc.longitude }}' />
+                      <button type='submit' class='link-button'>{{ loc.name }} ({{ loc.latitude }}, {{ loc.longitude }})</button>
+                    </form>
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p>No favorite locations saved.</p>
+            {% endif %}
+          </div>
         {% endif %}
       </section>
       <br>
