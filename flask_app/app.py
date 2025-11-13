@@ -10,17 +10,37 @@ Handles Flask application routes and rendering templates.
 /submitCoord and /submitCity routes process user input and fetch weather data.
 '''
 
+from flask_app.users import Users
 from flask_app import api
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 
 from dotenv import load_dotenv
+from datetime import datetime, timezone
+import base64
 import os
+import json
+import random
 
 def create_app():
+    users_instance = Users()
     load_dotenv()
 
     app = Flask(__name__)
     app.secret_key = os.environ.get("OPEN_WEATHER_MAP_API_KEY")
+
+    def cookie() -> str:
+        s = ""
+        for _ in range(10):
+            s = s + chr(random.randint(0x41, 0x67))
+
+        return s
+
+    def is_authed(req) -> bool:
+        if 'auth' in req.cookies:
+            if req.cookies['auth'] in users_instance.authenticated:
+                return True
+
+        return False
 
     @app.route('/')
     def index():
@@ -88,6 +108,47 @@ def create_app():
         
         return query_hourly_forecast(latitude, longitude)
 
+    @app.route('/login', methods=['POST'])
+    def login():
+        auth = request.data.decode('utf-8')
+        data = json.loads(auth)        
+        user_name, pw_hash = base64.b64decode(data['auth']).decode('utf-8').split(':')
+
+        if users_instance.login(user_name=user_name, pw=pw_hash):
+            c = cookie()
+            resp = make_response(redirect(url_for('index')), 200)
+            resp.set_cookie('auth', c)
+            user = users_instance.get_user(user_name)
+            if user:
+                user.last_login = str(datetime.now(timezone.utc))
+                users_instance.authenticated[c] = user
+                return resp
+            else:
+                flash('Login failed. User not found.', 'error')
+                return redirect(url_for('index'), code=401)
+            
+        else:
+            flash('Login failed. Please check your username and password.', 'error')
+            return redirect(url_for('index'), code=401)
+        
+    @app.route('/logout', methods=['POST'])
+    def logout():
+        user = None
+        auth_cookie = request.cookies.get('auth')
+        if auth_cookie and auth_cookie in users_instance.authenticated:
+            user = users_instance.authenticated[auth_cookie]
+            del users_instance.authenticated[auth_cookie]
+
+        if user:
+            user.last_login = ''
+            resp = make_response(redirect(url_for('index')), 200)
+            resp.delete_cookie('auth')
+            return resp
+        else:
+            flash('Logout failed. User not found.', 'error')
+            return redirect(url_for('index'), is_authed=False, code=401)
+        
     return app
+
 
 app_instance = create_app()
