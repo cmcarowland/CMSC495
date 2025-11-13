@@ -58,9 +58,34 @@ Landing page for user to input city/country or latitude/longitude coordinates.
       </section>
     </main>
 
-    <dialog id="error" class="dlalog-window">
+    <dialog class="error-dialog">
       <p id="dialogMessage"></p>
       <button autofocus>Close</button>
+    </dialog>
+
+    <dialog id="loginDialog" class="login-dialog">
+      <div class="tab">
+        <button class="tablinks" onclick="changeTab(event, 'loginTab')">Login</button>
+        <button class="tablinks" onclick="changeTab(event, 'signupTab')">Signup</button>
+      </div>
+      <div id="loginTab" class="tabcontent">
+        <label for="uname">Username </label>
+        <input type="text" id="uname" name="uname">
+        <label for="pword">Password </label>
+        <input type="password" id="pword" name="pword">
+        <button id="submitLogin">Submit</button>
+        <button id="closeLogin" onclick="closeLoginDialog()">Close</button>
+      </div>
+      <div id="signupTab" class="tabcontent">
+        <label for="uname">Username </label>
+        <input type="text" id="uname" name="uname">
+        <label for="pword">Password </label>
+        <input type="password" id="pword" name="pword">
+        <label for="pword_confirm">Confirm Password </label>
+        <input type="password" id="pword_confirm" name="pword_confirm">
+        <button id="submitLogin">Submit</button>
+        <button id="closeLogin" onclick="closeLoginDialog()">Close</button>
+      </div>
     </dialog>
 
     <footer>
@@ -68,6 +93,14 @@ Landing page for user to input city/country or latitude/longitude coordinates.
     </footer>
 
     <script>
+      const login = document.querySelector('#loginDialog');
+      login.showModal();
+
+      function closeLoginDialog() {
+        console.log("Closing login dialog");
+        login.close();
+      }
+
       const dialog = document.querySelector('dialog');
       const closeButton = dialog ? dialog.querySelector('button') : null;
 
@@ -125,6 +158,24 @@ Landing page for user to input city/country or latitude/longitude coordinates.
           return hashHex;
         });
       }
+
+      function changeTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+          tabcontent[i].style.display = "none";
+        }
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+          tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+        document.getElementById(tabName).style.display = "grid";
+        evt.currentTarget.className += " active";
+      }
+
+      document.addEventListener("DOMContentLoaded", function() {
+        document.querySelector(".tablinks").click();
+      });
     </script>
   </body>
 </html>
