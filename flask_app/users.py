@@ -18,7 +18,8 @@ class Users:
 
     def save(self):
         with open(Users.FILENAME, 'w', encoding='utf-8') as ofile:
-            json.dump(self.users, ofile, indent=4)
+            users = [user.to_json() for user in self.users]
+            json.dump({"users": users}, ofile, indent=4)
 
     def get_user(self, user_name) -> User | None:
         user = list(filter(lambda x: x.user_name == user_name, self.users))
