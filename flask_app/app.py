@@ -41,6 +41,13 @@ def create_app():
                 return True
 
         return False
+    
+    def get_auth_user_name(req) -> str:
+        if 'auth' in req.cookies:
+            if req.cookies['auth'] in users_instance.authenticated:
+                return users_instance.authenticated[req.cookies['auth']].user_name
+
+        return "Invalid Login Token"
 
     @app.route('/')
     def index():
@@ -130,6 +137,34 @@ def create_app():
         else:
             flash('Login failed. Please check your username and password.', 'error')
             return redirect(url_for('index'), code=401)
+   
+    @app.route('/signup', methods=['POST'])
+    def signup():
+        user = None
+        auth = request.data.decode('utf-8')
+        data = json.loads(auth)       
+        user_name, pw_hash = base64.b64decode(data['auth']).decode('utf-8').split(':')
+        user = users_instance.get_user(user_name)
+        if user:
+            flash('Signup failed. User already exists.', 'error')
+            return redirect(url_for('index'), code=401)
+        
+        if users_instance.add_user(user_name=user_name, pw=pw_hash):
+            c = cookie()
+            resp = make_response(redirect(url_for('index')), 200)
+            resp.set_cookie('auth', c)
+            user = users_instance.get_user(user_name)
+            if user:
+                user.last_login = str(datetime.now(timezone.utc))
+                users_instance.authenticated[c] = user
+                return resp
+            else:
+                flash('Signup failed. User not found.', 'error')
+                return redirect(url_for('index'), code=401)
+            
+        else:
+            flash('Signup failed. Please check your username and password.', 'error')
+            return redirect(url_for('index'), code=401)
         
     @app.route('/logout', methods=['POST'])
     def logout():
@@ -145,9 +180,13 @@ def create_app():
             resp.delete_cookie('auth')
             return resp
         else:
-            flash('Logout failed. User not found.', 'error')
-            return redirect(url_for('index'), is_authed=False, code=401)
+            flash('Logout failed. User was not logged in.', 'error')
+            user = users_instance.get_user(get_auth_user_name(request))
+            resp = make_response(redirect(url_for('index')), 200)
+            resp.delete_cookie('auth')
+            return resp
         
+    app.jinja_env.globals['get_auth_user_name'] = get_auth_user_name
     return app
 
 
