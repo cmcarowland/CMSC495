@@ -1,4 +1,4 @@
-from user import User
+from flask_app.user import User
 
 import json
 import os
@@ -8,10 +8,13 @@ class Users:
 
     def __init__(self):
         self.users = []
+        self.authenticated = {}
 
         if os.path.exists(Users.FILENAME):
             with open(Users.FILENAME, 'r', encoding='utf-8') as ifile:
-                self.users = json.load(ifile)
+                for user_data in json.load(ifile)['users']:
+                    user = User.from_json(user_data)
+                    self.users.append(user)
 
     def save(self):
         with open(Users.FILENAME, 'w', encoding='utf-8') as ofile:
@@ -21,7 +24,7 @@ class Users:
         user = list(filter(lambda x: x.user_name == user_name, self.users))
 
         if len(user) == 1:
-            return user
+            return user[0]
 
         return None
 
@@ -41,7 +44,7 @@ class Users:
         if not user:
             return False
 
-        if pw != user.password:
+        if pw != user.password_hash:
             return False
 
         return True
