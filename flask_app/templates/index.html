@@ -24,18 +24,22 @@ Landing page for user to input city/country or latitude/longitude coordinates.
       <img src="{{ url_for('static', filename='resources/Sunapp.png') }}" alt="Logo" class="logo" />
       <h1>GoldenHour</h1>
       <p class="tagline">Plan your outdoor activities by sunrise, sunset, and weather</p>
-      {% if not request.cookies.get('auth') %}
-        <button type="button" id="loginBtn" onclick="document.getElementById('loginDialog').showModal();">Login/Signup</button>
-      {% else %}
-        <button type="button" onclick="logUserOut()">Logout</button>
-      {% endif %}
     </header>
 
     <header class="mobile-site-header">
       <img src="{{ url_for('static', filename='resources/Sunapp.png') }}" alt="Logo" class="logo" />
     </header>  
-
+    
     <main class="container">
+      <section class="hero">
+        {% if not request.cookies.get('auth') %}
+          <button type="button" id="loginBtn" onclick="document.getElementById('loginDialog').showModal();">Login/Signup</button>
+        {% else %}
+          <label>Welcome, {{ get_auth_user_name(request) }}</label>
+          <button type="button" onclick="logUserOut()">Logout</button>
+        {% endif %}
+      </section>
+      <br>
       <section class="hero">
         <p>Enter a latitude/longitude to get sunrise/sunset times and weather forecasts.</p>
         <form action='/submitCoord' id="locForm" method="post" class="form-input-group">
@@ -88,7 +92,7 @@ Landing page for user to input city/country or latitude/longitude coordinates.
         <input type="password" id="pwordSignup" name="pword">
         <label for="pword_confirm">Confirm Password </label>
         <input type="password" id="pword_confirm" name="pword_confirm">
-        <button>Submit</button>
+        <button onclick="signup()">Submit</button>
         <button onclick="closeLoginDialog()">Close</button>
       </div>
     </dialog>
@@ -214,6 +218,52 @@ Landing page for user to input city/country or latitude/longitude coordinates.
         const b64encoded = btoa(combined);
         try {
           const resp = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ auth: b64encoded })
+          });
+
+          // on success, close dialog and navigate / refresh
+          login.close();
+          const data = await resp.json().catch(() => null);
+          if (data && data.redirect) {
+            window.location.href = data.redirect;
+          } else {
+            window.location.reload();
+          }
+        } catch (err) {
+          alert('Network error: ' + err.message);
+        }
+      }
+
+      async function signup(evt) {
+        const password = document.getElementById("pwordSignup").value;
+        if (!password) {
+          alert("Password cannot be empty");
+          return;
+        }
+
+        const password2 = document.getElementById("pword_confirm").value;
+        if (!password2) {
+          alert("Password confirmation cannot be empty");
+          return;
+        }
+
+        if (password !== password2) {
+          alert("Passwords do not match");
+          return;
+        }
+
+        const username = document.getElementById("unameSignup").value;
+        if (!username) {
+          alert("Username cannot be empty");
+          return;
+        }
+        
+        const combined = username + ":" + await hash(password);
+        const b64encoded = btoa(combined);
+        try {
+          const resp = await fetch('/signup', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ auth: b64encoded })
