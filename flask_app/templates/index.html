@@ -49,10 +49,15 @@ Landing page for user to input city/country or latitude/longitude coordinates.
                       <p id='lon'>{{ loc.longitude }}</p>
                       <p id='name'>{{ loc.name }}{{ ', ' + loc.state if loc.state else "" }}</p>
                       <p id='country'>{{ loc.country }}</p>
-                      <form action='/submitCoord' method='post'>
+                      <form action='/submitCoord' method='post' class="centered">
                         <input type='hidden' name='latitude' value='{{ loc.latitude }}'/>
                         <input type='hidden' name='longitude' value='{{ loc.longitude }}'/>
                         <button type='submit'>View</button>
+                      </form>
+                      <form action='/removeFavorite' method='post' class="centered">
+                        <input type='hidden' name='latitude' value='{{ loc.latitude }}'/>
+                        <input type='hidden' name='longitude' value='{{ loc.longitude }}'/>
+                        <button type='submit'>Remove</button>
                       </form>
                     </div> 
                   </li>
@@ -141,6 +146,14 @@ Landing page for user to input city/country or latitude/longitude coordinates.
           for (const [category, message] of flashedMessages) {
               if (category === 'error') {
                   document.getElementById("dialogMessage").innerText = message;
+                  dialog.classList.remove('success');
+                  dialog.classList.add('error');
+                  dialog.showModal();
+              }
+              else if (category === 'success') {
+                  document.getElementById("dialogMessage").innerText = message;
+                  dialog.classList.remove('error');
+                  dialog.classList.add('success');
                   dialog.showModal();
               }
           }
