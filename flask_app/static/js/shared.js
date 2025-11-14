@@ -18,7 +18,6 @@ function parseFlashedMessages(flashedMessages, dialog) {
 }
 
 function addToFavorites(url, lat, lon, city_name, country) {
-    console.log("Adding to favorites:", lat, lon, city_name, country);
     fetch(url, {
         method: "POST",
         headers: {
@@ -31,10 +30,9 @@ function addToFavorites(url, lat, lon, city_name, country) {
             name: city_name, 
             country: country 
         })
-    })
-    .then(response => {
+    }).then(response => {
         if (response.redirected) {
-            window.location.reload();
+            window.location.href = response.url;
         }
     });
 }

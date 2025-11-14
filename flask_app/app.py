@@ -200,7 +200,24 @@ def create_app():
             resp.delete_cookie('auth')
             return resp
     
-    @app.route('/favorite', methods=['POST'])
+    @app.route('/city', methods=['GET'])
+    def city():
+        # Render city data via GET so the browser URL is not a POST endpoint.
+        lat = request.args.get('latitude')
+        lon = request.args.get('longitude')
+        if not lat or not lon:
+            flash('Missing coordinates.', 'error')
+            return redirect(url_for('index'))
+        
+        try:
+            latf = float(lat)
+            lonf = float(lon)
+        except (TypeError, ValueError):
+            flash('Invalid coordinates.', 'error')
+            return redirect(url_for('index'))
+        return query_hourly_forecast(latf, lonf)
+    
+    @app.route('/favorite', methods=['POST', 'OPTIONS'])
     def favorite():
         user = get_auth_user(request)
         if not user:
@@ -216,11 +233,10 @@ def create_app():
 
         user.favorite_locations.append(location)
         users_instance.save()
-        return redirect(request.referrer or url_for('index'))
+        return redirect(url_for('city', latitude=location.latitude, longitude=location.longitude))
     
     @app.route('/removeFavorite', methods=['POST'])
     def remove_favorite():
-        print('Removing from favorites...')
         user = get_auth_user(request)
         if not user:
             flash('You must be logged in to remove a favorite location.', 'error')
