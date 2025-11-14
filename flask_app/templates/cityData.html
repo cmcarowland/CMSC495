@@ -97,6 +97,11 @@ for a specified city or geographical coordinates.
       <button id="back">Go Back</button>
     </main>
 
+    <dialog id="errorDialog" class="error-dialog">
+      <p id="dialogMessage"></p>
+      <button autofocus>Close</button>
+    </dialog>
+    
     <footer>
       <small>© 2025 GoldenHour for CMSC495</small>
     </footer>
@@ -104,6 +109,31 @@ for a specified city or geographical coordinates.
     <script>
       document.querySelector('#back').addEventListener('click', function() {
         window.location.href = "{{ url_for('index') }}";
+      });
+
+      const dialog = document.querySelector('#errorDialog');
+      const closeButton = dialog ? dialog.querySelector('button') : null;
+
+      const flashedMessages = {{ get_flashed_messages(with_categories=true) | tojson }};
+      if (flashedMessages.length > 0) {
+          for (const [category, message] of flashedMessages) {
+              if (category === 'error') {
+                  document.getElementById("dialogMessage").innerText = message;
+                  dialog.classList.remove('success');
+                  dialog.classList.add('error');
+                  dialog.showModal();
+              }
+              else if (category === 'success') {
+                  document.getElementById("dialogMessage").innerText = message;
+                  dialog.classList.remove('error');
+                  dialog.classList.add('success');
+                  dialog.showModal();
+              }
+          }
+      }
+
+      closeButton?.addEventListener('click', () => {
+        dialog.close();
       });
 
       function addToFavorites(lat, lon, city_name, country) {
