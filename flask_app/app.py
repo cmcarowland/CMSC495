@@ -12,6 +12,7 @@ Handles Flask application routes and rendering templates.
 
 from flask_app.users import Users
 from flask_app import api
+from flask_app.location import Location
 from flask import Flask, render_template, request, redirect, url_for, flash, make_response
 
 from dotenv import load_dotenv
@@ -195,7 +196,27 @@ def create_app():
             resp = make_response(redirect(url_for('index')), 200)
             resp.delete_cookie('auth')
             return resp
-        
+    
+    @app.route('/favorite', methods=['POST'])
+    def favorite():
+        print('Adding to favorites...')
+        user = get_auth_user(request)
+        if not user:
+            flash('You must be logged in to favorite a location.', 'error')
+            return redirect(url_for('index'))
+
+        data = request.data.decode('utf-8')
+        loc_data = json.loads(data)
+        location = Location.from_json(loc_data)
+        if is_location_favorited(user, location.latitude, location.longitude):
+            flash('Location is already in favorites.', 'info')
+            return redirect(url_for('index'))
+
+        user.favorite_locations.append(location)
+        users_instance.save()
+        flash('Location added to favorites.', 'success')
+        return redirect(request.referrer or url_for('index'))
+
     app.jinja_env.globals['get_auth_user_name'] = get_auth_user_name
     app.jinja_env.globals['is_location_favorited'] = is_location_favorited
     return app
