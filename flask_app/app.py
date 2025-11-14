@@ -239,8 +239,11 @@ def create_app():
         
         user.remove_favorite_location(lat, lon)
         users_instance.save()
-            
-        return query_hourly_forecast(lat, lon)
+        
+        if request.referrer.endswith('/'):
+            return redirect(url_for('index'))
+        else:
+            return query_hourly_forecast(lat, lon)
     
     app.jinja_env.globals['get_auth_user_name'] = get_auth_user_name
     app.jinja_env.globals['is_location_favorited'] = is_location_favorited
