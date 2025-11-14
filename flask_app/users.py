@@ -19,8 +19,6 @@ class Users:
                     user = User.from_json(user_data)
                     self.users.append(user)
 
-        print(self.users[0].favorite_locations[0].state)
-
     @staticmethod
     def get_next_id() -> int:
         nid = Users.NEXT_ID
