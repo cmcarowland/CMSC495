@@ -138,6 +138,7 @@ def create_app():
                 resp.set_cookie('auth', c)
                 user.last_login = str(datetime.now(timezone.utc))
                 users_instance.authenticated[c] = user
+                flash('Login successful.', 'success')
                 return resp
             else:
                 flash('Login failed. Please check your username and password.', 'error')
@@ -166,6 +167,7 @@ def create_app():
             if user:
                 user.last_login = str(datetime.now(timezone.utc))
                 users_instance.authenticated[c] = user
+                flash('Signup successful.', 'success')
                 return resp
             else:
                 flash('Signup failed. User not found.', 'error')
@@ -185,6 +187,7 @@ def create_app():
 
         if user:
             user.last_login = ''
+            flash('Logout successful.', 'success')
             resp = make_response(redirect(url_for('index')), 200)
             resp.delete_cookie('auth')
             return resp
@@ -216,6 +219,31 @@ def create_app():
         users_instance.save()
         flash('Location added to favorites.', 'success')
         return redirect(request.referrer or url_for('index'))
+    
+    @app.route('/removeFavorite', methods=['POST'])
+    def remove_favorite():
+        print('Removing from favorites...')
+        user = get_auth_user(request)
+        if not user:
+            flash('You must be logged in to remove a favorite location.', 'error')
+            return redirect(url_for('index'))
+
+        try:
+            lat = float(request.form.get('latitude'))
+            lon = float(request.form.get('longitude'))
+        except (TypeError, ValueError):
+            flash('Invalid latitude or longitude.', 'error')
+            return redirect(url_for('index'))
+        
+        
+        if not is_location_favorited(user, lat, lon):
+            flash('Location is not in favorites.', 'error')
+            return redirect(url_for('index'))
+
+        user.remove_favorite_location(lat, lon)
+        users_instance.save()
+        flash('Location removed from favorites.', 'success')
+        return redirect(url_for('index'))
 
     app.jinja_env.globals['get_auth_user_name'] = get_auth_user_name
     app.jinja_env.globals['is_location_favorited'] = is_location_favorited
