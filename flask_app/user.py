@@ -15,6 +15,14 @@ class User:
             'favorite_locations': [loc.to_json() for loc in self.favorite_locations]
         }
     
+    def remove_favorite_location(self, latitude, longitude):
+        for loc in self.favorite_locations:
+            if loc.latitude == latitude and loc.longitude == longitude:
+                self.favorite_locations.remove(loc)
+                return True
+        
+        return False
+    
     @staticmethod
     def from_json(data):
         user = User(data['username'], data['password_hash'])
