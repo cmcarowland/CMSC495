@@ -218,24 +218,19 @@ class GoldenHourData:
         sunset_hour = self.sunset - (self.sunset % 3600)
 
         while True:
-            sunrise = list(filter(lambda x: x['dt'] == sunrise_hour, json_data['list']))
-            if sunrise_hour < datetime.datetime.now().timestamp() and len(sunrise) == 0:
+            sunrise = next(filter(lambda x: x['dt'] == sunrise_hour, json_data['list']), None)
+            if sunrise_hour < datetime.datetime.now().timestamp() and sunrise is None:
                 data = api.query_historical_forecast(self.coordinates[0], self.coordinates[1], sunrise_hour)
                 sunrise = data
-            elif len(sunrise) > 0:
-                sunrise = sunrise[0]
-            else:
-                sunrise = None
+            elif sunrise is not None:
+                sunrise = sunrise
             
-            sunset = list(filter(lambda x: x['dt'] == sunset_hour, json_data['list']))
-
-            if sunset_hour < datetime.datetime.now().timestamp() and len(sunset) == 0:
+            sunset = next(filter(lambda x: x['dt'] == sunset_hour, json_data['list']), None)
+            if sunset_hour < datetime.datetime.now().timestamp() and sunset is None:
                 data = api.query_historical_forecast(self.coordinates[0], self.coordinates[1], sunset_hour)
                 sunset = data
-            elif len(sunset) > 0:
-                sunset = sunset[0]
-            else:
-                sunset = None
+            elif sunset is not None:
+                sunset = sunset
 
             if sunrise == None and sunset == None and len(self.days) > 0:
                 break
