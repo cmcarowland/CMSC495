@@ -45,13 +45,13 @@ Landing page for user to input city/country or latitude/longitude coordinates.
                 {% for loc in user.favorite_locations %}
                   <li>
                     <div class="favorite-grid">
-                      <p id='lat'>{{ loc["lat"] }}</p>
-                      <p id='lon'>{{ loc["lon"] }}</p>
-                      <p id='name'>{{ loc["name"] }}{{ ', ' +loc["state"] if loc["state"] else "" }}</p>
-                      <p id='country'>{{ loc["country"] }}</p>
+                      <p id='lat'>{{ loc.latitude }}</p>
+                      <p id='lon'>{{ loc.longitude }}</p>
+                      <p id='name'>{{ loc.name }}{{ ', ' + loc.state if loc.state else "" }}</p>
+                      <p id='country'>{{ loc.country }}</p>
                       <form action='/submitCoord' method='post'>
-                        <input type='hidden' name='latitude' value='{{ loc["lat"] }}'/>
-                        <input type='hidden' name='longitude' value='{{ loc["lon"] }}'/>
+                        <input type='hidden' name='latitude' value='{{ loc.latitude }}'/>
+                        <input type='hidden' name='longitude' value='{{ loc.longitude }}'/>
                         <button type='submit'>View</button>
                       </form>
                     </div> 

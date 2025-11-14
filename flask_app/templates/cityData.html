@@ -39,6 +39,9 @@ for a specified city or geographical coordinates.
       <section class="hero">
         <h3 class="centered">{{ weather_data.city_name }}, {{ weather_data.country }}</h3>
         <p class="centered">Latitude: {{ weather_data.coordinates[0] }} Longitude: {{ weather_data.coordinates[1] }}</p>
+        {% if user and not is_location_favorited(user, weather_data.coordinates[0], weather_data.coordinates[1]) %}
+          <button>Add to Favorites</button>
+        {% endif %}
         <div class="weather-grid">
           <h4>Date</h4>
           <h4>Sunrise  {{ weather_data.sunrise_dt }}</h4>
@@ -91,7 +94,7 @@ for a specified city or geographical coordinates.
         {% endfor %}
         </div>
       </section>
-      <button>Go Back</button>
+      <button id="back">Go Back</button>
     </main>
 
     <footer>
@@ -99,7 +102,7 @@ for a specified city or geographical coordinates.
     </footer>
 
     <script>
-      document.querySelector('button').addEventListener('click', function() {
+      document.querySelector('#back').addEventListener('click', function() {
         window.location.href = "{{ url_for('index') }}";
       });
     </script>
