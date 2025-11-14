@@ -202,7 +202,6 @@ def create_app():
     
     @app.route('/favorite', methods=['POST'])
     def favorite():
-        print('Adding to favorites...')
         user = get_auth_user(request)
         if not user:
             flash('You must be logged in to favorite a location.', 'error')
@@ -217,7 +216,6 @@ def create_app():
 
         user.favorite_locations.append(location)
         users_instance.save()
-        flash('Location added to favorites.', 'success')
         return redirect(request.referrer or url_for('index'))
     
     @app.route('/removeFavorite', methods=['POST'])
@@ -235,16 +233,15 @@ def create_app():
             flash('Invalid latitude or longitude.', 'error')
             return redirect(url_for('index'))
         
-        
         if not is_location_favorited(user, lat, lon):
             flash('Location is not in favorites.', 'error')
             return redirect(url_for('index'))
-
+        
         user.remove_favorite_location(lat, lon)
         users_instance.save()
-        flash('Location removed from favorites.', 'success')
-        return redirect(url_for('index'))
-
+            
+        return query_hourly_forecast(lat, lon)
+    
     app.jinja_env.globals['get_auth_user_name'] = get_auth_user_name
     app.jinja_env.globals['is_location_favorited'] = is_location_favorited
     return app
