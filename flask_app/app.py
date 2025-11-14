@@ -34,13 +34,6 @@ def create_app():
             s = s + chr(random.randint(0x41, 0x67))
 
         return s
-
-    def is_authed(req) -> bool:
-        if 'auth' in req.cookies:
-            if req.cookies['auth'] in users_instance.authenticated:
-                return True
-
-        return False
     
     def get_auth_user_name(req) -> str:
         if 'auth' in req.cookies:
@@ -49,10 +42,23 @@ def create_app():
 
         return "Invalid Login Token"
 
+    def get_auth_user(req):
+        if 'auth' in req.cookies:
+            if req.cookies['auth'] in users_instance.authenticated:
+                return users_instance.authenticated[req.cookies['auth']]
+
+        return None
+    
+    def is_location_favorited(user, latitude, longitude) -> bool:
+        for loc in user.favorite_locations:
+            if loc.latitude == latitude and loc.longitude == longitude:
+                return True
+            
+        return False
+
     @app.route('/')
     def index():
-        c = request.cookies.get('auth')
-        user = users_instance.authenticated.get(c)
+        user = get_auth_user(request)
         return render_template('index.html', user=user)
 
     def query_hourly_forecast(latitude, longitude):
@@ -65,7 +71,8 @@ def create_app():
             flash('Location not found. Please try again.', 'error')
             return redirect(url_for('index'))
 
-        return render_template('cityData.html', weather_data=weather_data)
+        user = get_auth_user(request)
+        return render_template('cityData.html', weather_data=weather_data, user=user)
 
     @app.route('/submitCoord', methods=['POST'])
     def submit_coord():
@@ -183,11 +190,14 @@ def create_app():
         else:
             flash('Logout failed. User was not logged in.', 'error')
             user = users_instance.get_user(get_auth_user_name(request))
+            if user:
+                user.last_login = ''
             resp = make_response(redirect(url_for('index')), 200)
             resp.delete_cookie('auth')
             return resp
         
     app.jinja_env.globals['get_auth_user_name'] = get_auth_user_name
+    app.jinja_env.globals['is_location_favorited'] = is_location_favorited
     return app
 
 
