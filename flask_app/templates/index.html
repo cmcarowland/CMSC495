@@ -29,8 +29,47 @@ Landing page for user to input city/country or latitude/longitude coordinates.
     <header class="mobile-site-header">
       <img src="{{ url_for('static', filename='resources/Sunapp.png') }}" alt="Logo" class="logo" />
     </header>  
-
+    
     <main class="container">
+      <section class="hero">
+        {% if not user %}
+          <button type="button" id="loginBtn" onclick="document.getElementById('loginDialog').showModal();">Login/Signup</button>
+        {% else %}
+          <label>Welcome, {{ user.user_name }}</label>
+          <br>
+          <button type="button" onclick="logUserOut()">Logout</button>
+          <div> 
+            <h3>Favorite Locations</h3>
+            {% if user.favorite_locations %}
+              <ul>
+                {% for loc in user.favorite_locations %}
+                  <li>
+                    <div class="favorite-grid">
+                      <p id='lat'>{{ loc.latitude }}</p>
+                      <p id='lon'>{{ loc.longitude }}</p>
+                      <p id='name'>{{ loc.name }}{{ ', ' + loc.state if loc.state else "" }}</p>
+                      <p id='country'>{{ loc.country }}</p>
+                      <form action='/submitCoord' method='post' class="centered">
+                        <input type='hidden' name='latitude' value='{{ loc.latitude }}'/>
+                        <input type='hidden' name='longitude' value='{{ loc.longitude }}'/>
+                        <button type='submit'>View</button>
+                      </form>
+                      <form action='/removeFavorite' method='post' class="centered">
+                        <input type='hidden' name='latitude' value='{{ loc.latitude }}'/>
+                        <input type='hidden' name='longitude' value='{{ loc.longitude }}'/>
+                        <button type='submit'>Remove</button>
+                      </form>
+                    </div> 
+                  </li>
+                {% endfor %}
+              </ul>
+            {% else %}
+              <p>No favorite locations saved.</p>
+            {% endif %}
+          </div>
+        {% endif %}
+      </section>
+      <br>
       <section class="hero">
         <p>Enter a latitude/longitude to get sunrise/sunset times and weather forecasts.</p>
         <form action='/submitCoord' id="locForm" method="post" class="form-input-group">
@@ -58,32 +97,56 @@ Landing page for user to input city/country or latitude/longitude coordinates.
       </section>
     </main>
 
-    <dialog id="error" class="dlalog-window">
+    <dialog id="errorDialog" class="error-dialog">
       <p id="dialogMessage"></p>
       <button autofocus>Close</button>
+    </dialog>
+
+    <dialog id="loginDialog" class="login-dialog">
+      <div class="tab">
+        <button class="tablinks" onclick="changeTab(event, 'loginTab')">Login</button>
+        <button class="tablinks" onclick="changeTab(event, 'signupTab')">Signup</button>
+      </div>
+      <div id="loginTab" class="tabcontent">
+        <label for="unameLogin">Username </label>
+        <input type="text" id="unameLogin" name="uname">
+        <label for="pword">Password </label>
+        <input type="password" id="pwordLogin" name="pword">
+        <button onclick="logintoServer()">Submit</button>
+        <button onclick="closeLoginDialog()">Close</button>
+      </div>
+      <div id="signupTab" class="tabcontent">
+        <label for="unameSignup">Username </label>
+        <input type="text" id="unameSignup" name="uname">
+        <label for="pwordSignup">Password </label>
+        <input type="password" id="pwordSignup" name="pword">
+        <label for="pword_confirm">Confirm Password </label>
+        <input type="password" id="pword_confirm" name="pword_confirm">
+        <button onclick="signup()">Submit</button>
+        <button onclick="closeLoginDialog()">Close</button>
+      </div>
     </dialog>
 
     <footer>
       <small>© 2025 GoldenHour for CMSC495</small>
     </footer>
 
+    <script src="{{ url_for('static', filename='js/shared.js') }}"></script>
     <script>
-      const dialog = document.querySelector('dialog');
-      const closeButton = dialog ? dialog.querySelector('button') : null;
+      const login = document.querySelector('#loginDialog');
 
-      const flashedMessages = {{ get_flashed_messages(with_categories=true) | tojson }};
-      if (flashedMessages.length > 0) {
-          for (const [category, message] of flashedMessages) {
-              if (category === 'error') {
-                  document.getElementById("dialogMessage").innerText = message;
-                  dialog.showModal();
-              }
-          }
+      function closeLoginDialog() {
+        login.close();
       }
 
+      const dialog = document.querySelector('#errorDialog');
+      const closeButton = dialog ? dialog.querySelector('button') : null;
       closeButton?.addEventListener('click', () => {
         dialog.close();
       });
+
+      const flashedMessages = {{ get_flashed_messages(with_categories=true) | tojson }};
+      parseFlashedMessages(flashedMessages, dialog);
 
       function showPosition(position) {
         document.getElementById("latitude").value = position.coords.latitude;
@@ -116,6 +179,135 @@ Landing page for user to input city/country or latitude/longitude coordinates.
             alert("Geolocation is not supported by this browser.");
           }
       };
+
+      function hash(string) {
+        const utf8 = new TextEncoder().encode(string);
+        return crypto.subtle.digest('SHA-256', utf8).then((hashBuffer) => {
+          const hashArray = Array.from(new Uint8Array(hashBuffer));
+          const hashHex = hashArray.map(bytes => bytes.toString(16).padStart(2, '0')).join('');
+          return hashHex;
+        });
+      }
+
+      function changeTab(evt, tabName) {
+        var i, tabcontent, tablinks;
+        tabcontent = document.getElementsByClassName("tabcontent");
+        for (i = 0; i < tabcontent.length; i++) {
+          if (tabcontent[i].id === "loginBase") {
+            continue;
+          }
+
+          tabcontent[i].style.display = "none";
+        }
+
+        tablinks = document.getElementsByClassName("tablinks");
+        for (i = 0; i < tablinks.length; i++) {
+          if (tabcontent[i].id === "loginBase") {
+            continue;
+          }
+
+          tablinks[i].className = tablinks[i].className.replace(" active", "");
+        }
+
+        document.getElementById(tabName).style.display = "grid";
+        evt.currentTarget.className += " active";
+      }
+
+      function logUserOut() {
+        fetch('/logout', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' }
+        }).then(() => {
+          window.location.reload();
+        }).catch((err) => {
+          alert('Network error: ' + err.message);
+        });
+      }
+
+      async function logintoServer(evt) {
+        const username = document.getElementById("unameLogin").value;
+        if (!username) {
+          alert("Username cannot be empty");
+          return;
+        }
+        
+        const password = document.getElementById("pwordLogin").value;
+        if (!password) {
+          alert("Password cannot be empty");
+          return;
+        }
+
+        const combined = username + ":" + await hash(password);
+        const b64encoded = btoa(combined);
+        try {
+          const resp = await fetch('/login', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ auth: b64encoded })
+          });
+
+          // on success, close dialog and navigate / refresh
+          login.close();
+          const data = await resp.json().catch(() => null);
+          if (data && data.redirect) {
+            window.location.href = data.redirect;
+          } else {
+            window.location.reload();
+          }
+        } catch (err) {
+          alert('Network error: ' + err.message);
+        }
+      }
+
+      async function signup(evt) {
+        const password = document.getElementById("pwordSignup").value;
+        if (!password) {
+          alert("Password cannot be empty");
+          return;
+        }
+
+        const password2 = document.getElementById("pword_confirm").value;
+        if (!password2) {
+          alert("Password confirmation cannot be empty");
+          return;
+        }
+
+        if (password !== password2) {
+          alert("Passwords do not match");
+          return;
+        }
+
+        const username = document.getElementById("unameSignup").value;
+        if (!username) {
+          alert("Username cannot be empty");
+          return;
+        }
+        
+        const combined = username + ":" + await hash(password);
+        const b64encoded = btoa(combined);
+        try {
+          const resp = await fetch('/signup', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ auth: b64encoded })
+          });
+
+          // on success, close dialog and navigate / refresh
+          login.close();
+          const data = await resp.json().catch(() => null);
+          if (data && data.redirect) {
+            window.location.href = data.redirect;
+          } else {
+            window.location.reload();
+          }
+        } catch (err) {
+          alert('Network error: ' + err.message);
+        }
+      }
+
+      document.addEventListener("DOMContentLoaded", function() {
+        document.querySelector(".tablinks").click();
+      });
     </script>
   </body>
 </html>

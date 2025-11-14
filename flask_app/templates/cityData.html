@@ -39,6 +39,21 @@ for a specified city or geographical coordinates.
       <section class="hero">
         <h3 class="centered">{{ weather_data.city_name }}, {{ weather_data.country }}</h3>
         <p class="centered">Latitude: {{ weather_data.coordinates[0] }} Longitude: {{ weather_data.coordinates[1] }}</p>
+        {% if user %}
+          {% if is_location_favorited(user, weather_data.coordinates[0], weather_data.coordinates[1]) %}
+            <form action='/removeFavorite' method='post' class="centered">
+              <input type='hidden' name='latitude' value='{{ weather_data.coordinates[0] }}'/>
+              <input type='hidden' name='longitude' value='{{ weather_data.coordinates[1] }}'/>
+              <input class="favorite-image" type="image" width="25px" src="{{ url_for('static', filename='resources/icon_star_round.png') }}" />
+            </form>
+            
+          {% else %}
+            <input class="favorite-image" width="25px" type="image" 
+              src="{{ url_for('static', filename='resources/icon_star_round_outline.png') }}"
+              onclick="addToFavorites('{{ url_for('favorite') }}', {{ weather_data.coordinates[0] }}, {{ weather_data.coordinates[1] }}, '{{ weather_data.city_name }}', '{{ weather_data.country }}')" 
+            />
+          {% endif %}
+        {% endif %}
         <div class="weather-grid">
           <h4>Date</h4>
           <h4>Sunrise  {{ weather_data.sunrise_dt }}</h4>
@@ -91,18 +106,32 @@ for a specified city or geographical coordinates.
         {% endfor %}
         </div>
       </section>
-      <button>Go Back</button>
+      <button id="back">Go Back</button>
     </main>
 
+    <dialog id="errorDialog" class="error-dialog">
+      <p id="dialogMessage"></p>
+      <button autofocus>Close</button>
+    </dialog>
+    
     <footer>
       <small>© 2025 GoldenHour for CMSC495</small>
     </footer>
-
+    
+    <script src="{{ url_for('static', filename='js/shared.js') }}"></script>
     <script>
-      document.querySelector('button').addEventListener('click', function() {
+      document.querySelector('#back').addEventListener('click', function() {
         window.location.href = "{{ url_for('index') }}";
       });
+
+      const dialog = document.querySelector('#errorDialog');
+      const closeButton = dialog ? dialog.querySelector('button') : null;
+      closeButton?.addEventListener('click', () => {
+          dialog.close();
+      });
+
+      const flashedMessages = {{ get_flashed_messages(with_categories=true) | tojson }};
+      parseFlashedMessages(flashedMessages, dialog);
     </script>
-    
   </body>
 </html>
