@@ -131,6 +131,7 @@ Landing page for user to input city/country or latitude/longitude coordinates.
       <small>© 2025 GoldenHour for CMSC495</small>
     </footer>
 
+    <script src="{{ url_for('static', filename='js/shared.js') }}"></script>
     <script>
       const login = document.querySelector('#loginDialog');
 
@@ -140,28 +141,12 @@ Landing page for user to input city/country or latitude/longitude coordinates.
 
       const dialog = document.querySelector('#errorDialog');
       const closeButton = dialog ? dialog.querySelector('button') : null;
-
-      const flashedMessages = {{ get_flashed_messages(with_categories=true) | tojson }};
-      if (flashedMessages.length > 0) {
-          for (const [category, message] of flashedMessages) {
-              if (category === 'error') {
-                  document.getElementById("dialogMessage").innerText = message;
-                  dialog.classList.remove('success');
-                  dialog.classList.add('error');
-                  dialog.showModal();
-              }
-              else if (category === 'success') {
-                  document.getElementById("dialogMessage").innerText = message;
-                  dialog.classList.remove('error');
-                  dialog.classList.add('success');
-                  dialog.showModal();
-              }
-          }
-      }
-
       closeButton?.addEventListener('click', () => {
         dialog.close();
       });
+
+      const flashedMessages = {{ get_flashed_messages(with_categories=true) | tojson }};
+      parseFlashedMessages(flashedMessages, dialog);
 
       function showPosition(position) {
         document.getElementById("latitude").value = position.coords.latitude;
