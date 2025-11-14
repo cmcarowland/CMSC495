@@ -40,7 +40,7 @@ for a specified city or geographical coordinates.
         <h3 class="centered">{{ weather_data.city_name }}, {{ weather_data.country }}</h3>
         <p class="centered">Latitude: {{ weather_data.coordinates[0] }} Longitude: {{ weather_data.coordinates[1] }}</p>
         {% if user and not is_location_favorited(user, weather_data.coordinates[0], weather_data.coordinates[1]) %}
-          <button>Add to Favorites</button>
+          <button onclick="addToFavorites({{ weather_data.coordinates[0] }}, {{ weather_data.coordinates[1] }}, '{{ weather_data.city_name }}', '{{ weather_data.country }}')">Add to Favorites</button>
         {% endif %}
         <div class="weather-grid">
           <h4>Date</h4>
@@ -105,6 +105,26 @@ for a specified city or geographical coordinates.
       document.querySelector('#back').addEventListener('click', function() {
         window.location.href = "{{ url_for('index') }}";
       });
+
+      function addToFavorites(lat, lon, city_name, country) {
+        fetch("{{ url_for('favorite') }}", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify(
+            { 
+              lat: lat, 
+              lon: lon, 
+              name: city_name, 
+              country: country })
+        })
+        .then(response => {
+          if (response.redirected) {
+            window.location.reload();
+          }
+        });
+      }
     </script>
     
   </body>
