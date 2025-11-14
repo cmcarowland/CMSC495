@@ -12,6 +12,8 @@ See [Flask App](flask_app/README.md)
 - Location based queries 
 - Get Geolocation for the device using browser API's
 
+<img src="images/GoldenHourDemo.gif" width=768>
+
 ### Coordinate Based Query
 <img src="images/Geolocation.png">
 
