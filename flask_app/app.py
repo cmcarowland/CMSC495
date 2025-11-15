@@ -42,6 +42,13 @@ def create_app():
                 return users_instance.authenticated[req.cookies['auth']].user_name
 
         return "Invalid Login Token"
+    
+    def get_auth_user_id(req) -> str:
+        if 'auth' in req.cookies:
+            if req.cookies['auth'] in users_instance.authenticated:
+                return users_instance.authenticated[req.cookies['auth']].id
+
+        return "Invalid Login Token"
 
     def get_auth_user(req):
         if 'auth' in req.cookies:
@@ -133,7 +140,7 @@ def create_app():
         Returns:
             A redirect response to the index page with a success or error message.
         """
-        
+
         auth = request.data.decode('utf-8')
         data = json.loads(auth)        
         email, pw_hash = base64.b64decode(data['auth']).decode('utf-8').split(':')
@@ -153,7 +160,7 @@ def create_app():
                 return redirect(url_for('index'), code=401)
  
         else:
-            flash('Login failed. User not found.', 'error')
+            flash('Login failed. User not found or invalid password.', 'error')
             return redirect(url_for('index'), code=401)
             
     @app.route('/signup', methods=['POST'])
@@ -208,7 +215,7 @@ def create_app():
             return resp
         else:
             flash('Logout failed. User was not logged in.', 'error')
-            user = users_instance.get_user(get_auth_user_name(request))
+            user = users_instance.get_user_by_id(get_auth_user_id(request))
             if user:
                 user.last_login = ''
             resp = make_response(redirect(url_for('index')), 200)
@@ -277,6 +284,7 @@ def create_app():
             return query_hourly_forecast(lat, lon)
     
     app.jinja_env.globals['get_auth_user_name'] = get_auth_user_name
+    app.jinja_env.globals['get_auth_user_id'] = get_auth_user_id
     app.jinja_env.globals['is_location_favorited'] = is_location_favorited
     return app
 
