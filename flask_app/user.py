@@ -1,7 +1,18 @@
 from flask_app.location import Location
 
 class User:
+    """
+    Class representing a user in the application.
+    """
+    
     def __init__(self, email, username, password_hash):
+        """
+        Initialize a new User instance.
+        Args:
+            email (str): The user's email address.
+            username (str): The user's username.
+            password_hash (str): The hashed password for the user.
+        """
         self.id = -1
         self.email = email
         self.user_name = username
@@ -10,6 +21,12 @@ class User:
         self.last_login = ''
 
     def to_json(self):
+        """
+        Convert the User instance to a JSON-serializable dictionary.
+        Returns:
+            dict: A dictionary representation of the User instance.
+        """
+
         return {
             'email': self.email,
             'username': self.user_name,
@@ -18,6 +35,15 @@ class User:
         }
     
     def remove_favorite_location(self, latitude, longitude):
+        """
+        Remove a favorite location by latitude and longitude.
+        Args:
+            latitude (float): The latitude of the location to remove.
+            longitude (float): The longitude of the location to remove.
+        Returns:
+            bool: True if the location was found and removed, False otherwise.
+        """
+
         for loc in self.favorite_locations:
             if loc.latitude == latitude and loc.longitude == longitude:
                 self.favorite_locations.remove(loc)
@@ -27,6 +53,14 @@ class User:
     
     @staticmethod
     def from_json(data):
+        """
+        Create a User instance from a JSON dictionary.
+        Args:
+            data (dict): A dictionary containing user data.
+        Returns:
+            User: An instance of the User class.
+        """
+
         user = User(data['email'], data['username'], data['password_hash'])
         user.favorite_locations = [Location.from_json(loc) for loc in data.get('favorite_locations', [])]
         return user
