@@ -150,6 +150,13 @@ def create_app():
             
     @app.route('/signup', methods=['POST'])
     def signup():
+        """
+        Signup a new user.
+        Args:
+            Form data containing 'auth' key with base64 encoded 'email:username:password_hash'.
+        Returns:
+            A redirect response to the index page with a success or error message.
+        """
         user = None
         auth = request.data.decode('utf-8')
         data = json.loads(auth)       
