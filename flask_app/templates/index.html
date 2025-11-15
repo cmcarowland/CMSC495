@@ -116,6 +116,8 @@ Landing page for user to input city/country or latitude/longitude coordinates.
         <button onclick="closeLoginDialog()">Close</button>
       </div>
       <div id="signupTab" class="tabcontent">
+        <label for="emailSignup">Email </label>
+        <input type="text" id="emailSignup" name="email">
         <label for="unameSignup">Username </label>
         <input type="text" id="unameSignup" name="uname">
         <label for="pwordSignup">Password </label>
@@ -277,13 +279,20 @@ Landing page for user to input city/country or latitude/longitude coordinates.
           return;
         }
 
+        const email = document.getElementById("emailSignup").value;
+        if (!email) {
+          alert("Email cannot be empty");
+          return;
+        }
+        // TODO: add email format validation
+        
         const username = document.getElementById("unameSignup").value;
         if (!username) {
           alert("Username cannot be empty");
           return;
         }
         
-        const combined = username + ":" + await hash(password);
+        const combined = email + ":" + username + ":" + await hash(password);
         const b64encoded = btoa(combined);
         try {
           const resp = await fetch('/signup', {
