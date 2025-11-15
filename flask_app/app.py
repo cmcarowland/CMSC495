@@ -126,13 +126,21 @@ def create_app():
 
     @app.route('/login', methods=['POST'])
     def login():
+        """
+        Login an existing user.
+        Args:
+            Form data containing 'auth' key with base64 encoded 'email:password_hash'.
+        Returns:
+            A redirect response to the index page with a success or error message.
+        """
+        
         auth = request.data.decode('utf-8')
         data = json.loads(auth)        
-        user_name, pw_hash = base64.b64decode(data['auth']).decode('utf-8').split(':')
+        email, pw_hash = base64.b64decode(data['auth']).decode('utf-8').split(':')
 
-        user = users_instance.get_user(user_name)
+        user = users_instance.get_user(email)
         if user: 
-            if users_instance.login(user_name=user_name, pw=pw_hash):
+            if users_instance.login(email, pw_hash):
                 c = cookie()
                 resp = make_response(redirect(url_for('index')), 200)
                 resp.set_cookie('auth', c)
