@@ -4,7 +4,7 @@ import json
 import os
 
 class Users:
-    FILENAME : str = 'users.json'
+    FILENAME : str = './data/users.json'
     NEXT_ID : int = 1
 
     def __init__(self):
