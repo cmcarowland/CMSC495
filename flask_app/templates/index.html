@@ -108,14 +108,16 @@ Landing page for user to input city/country or latitude/longitude coordinates.
         <button class="tablinks" onclick="changeTab(event, 'signupTab')">Signup</button>
       </div>
       <div id="loginTab" class="tabcontent">
-        <label for="unameLogin">Username </label>
-        <input type="text" id="unameLogin" name="uname">
+        <label for="emailLogin">Email </label>
+        <input type="text" id="emailLogin" name="email">
         <label for="pword">Password </label>
         <input type="password" id="pwordLogin" name="pword">
         <button onclick="logintoServer()">Submit</button>
         <button onclick="closeLoginDialog()">Close</button>
       </div>
       <div id="signupTab" class="tabcontent">
+        <label for="emailSignup">Email </label>
+        <input type="text" id="emailSignup" name="email">
         <label for="unameSignup">Username </label>
         <input type="text" id="unameSignup" name="uname">
         <label for="pwordSignup">Password </label>
@@ -225,9 +227,9 @@ Landing page for user to input city/country or latitude/longitude coordinates.
       }
 
       async function logintoServer(evt) {
-        const username = document.getElementById("unameLogin").value;
-        if (!username) {
-          alert("Username cannot be empty");
+        const email = document.getElementById("emailLogin").value;
+        if (!email) {
+          alert("Email cannot be empty");
           return;
         }
         
@@ -237,7 +239,7 @@ Landing page for user to input city/country or latitude/longitude coordinates.
           return;
         }
 
-        const combined = username + ":" + await hash(password);
+        const combined = email + ":" + await hash(password);
         const b64encoded = btoa(combined);
         try {
           const resp = await fetch('/login', {
@@ -277,13 +279,20 @@ Landing page for user to input city/country or latitude/longitude coordinates.
           return;
         }
 
+        const email = document.getElementById("emailSignup").value;
+        if (!email) {
+          alert("Email cannot be empty");
+          return;
+        }
+        // TODO: add email format validation
+
         const username = document.getElementById("unameSignup").value;
         if (!username) {
           alert("Username cannot be empty");
           return;
         }
         
-        const combined = username + ":" + await hash(password);
+        const combined = email + ":" + username + ":" + await hash(password);
         const b64encoded = btoa(combined);
         try {
           const resp = await fetch('/signup', {
