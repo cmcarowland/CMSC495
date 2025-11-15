@@ -1,8 +1,9 @@
 from flask_app.location import Location
 
 class User:
-    def __init__(self, username, password_hash):
+    def __init__(self, email, username, password_hash):
         self.id = -1
+        self.email = email
         self.user_name = username
         self.password_hash = password_hash
         self.favorite_locations = []
@@ -10,6 +11,7 @@ class User:
 
     def to_json(self):
         return {
+            'email': self.email,
             'username': self.user_name,
             'password_hash': self.password_hash,
             'favorite_locations': [loc.to_json() for loc in self.favorite_locations]
@@ -25,6 +27,6 @@ class User:
     
     @staticmethod
     def from_json(data):
-        user = User(data['username'], data['password_hash'])
+        user = User(data['email'], data['username'], data['password_hash'])
         user.favorite_locations = [Location.from_json(loc) for loc in data.get('favorite_locations', [])]
         return user
