@@ -30,28 +30,36 @@ class Users:
             users = [user.to_json() for user in self.users]
             json.dump({"NEXT_ID": Users.NEXT_ID, "users": users}, ofile, indent=4)
 
-    def get_user(self, user_name) -> User | None:
-        user = next(filter(lambda x: x.user_name == user_name, self.users), None)
+    def get_user(self, email) -> User | None:
+        user = next(filter(lambda x: x.email == email, self.users), None)
+
+        if user is not None:
+            return user
+
+        return None
+    
+    def get_user_by_id(self, id) -> User | None:
+        user = next(filter(lambda x: x.id == id, self.users), None)
 
         if user is not None:
             return user
 
         return None
 
-    def add_user(self, user_name : str, pw : str) -> bool:
-        user = self.get_user(user_name)
+    def add_user(self,  email : str, user_name : str, pw : str) -> bool:
+        user = self.get_user(email)
         if user:
             return False
         
-        user = User(user_name, pw)
+        user = User(email, user_name, pw)
         user.id = Users.get_next_id()
 
         self.users.append(user)
         self.save()
         return True
 
-    def login(self, user_name : str, pw : str) -> bool:
-        user = self.get_user(user_name)
+    def login(self, email : str, pw : str) -> bool:
+        user = self.get_user(email)
         if not user:
             return False
 
