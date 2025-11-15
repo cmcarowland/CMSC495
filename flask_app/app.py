@@ -153,17 +153,17 @@ def create_app():
         user = None
         auth = request.data.decode('utf-8')
         data = json.loads(auth)       
-        user_name, pw_hash = base64.b64decode(data['auth']).decode('utf-8').split(':')
-        user = users_instance.get_user(user_name)
+        email, user_name, pw_hash = base64.b64decode(data['auth']).decode('utf-8').split(':')
+        user = users_instance.get_user(email)
         if user:
             flash('Signup failed. User already exists.', 'error')
             return redirect(url_for('index'), code=401)
         
-        if users_instance.add_user(user_name=user_name, pw=pw_hash):
+        if users_instance.add_user(email, user_name, pw_hash):
             c = cookie()
             resp = make_response(redirect(url_for('index')), 200)
             resp.set_cookie('auth', c)
-            user = users_instance.get_user(user_name)
+            user = users_instance.get_user(email)
             if user:
                 user.last_login = str(datetime.now(timezone.utc))
                 users_instance.authenticated[c] = user
