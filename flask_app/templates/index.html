@@ -41,9 +41,7 @@ Landing page for user to input city/country or latitude/longitude coordinates.
           <div> 
             <h3>Favorite Locations</h3>
             {% if user.favorite_locations %}
-              <ul>
                 {% for loc in user.favorite_locations %}
-                  <li>
                     <div class="favorite-grid">
                       <p id='lat'>{{ loc.latitude }}</p>
                       <p id='lon'>{{ loc.longitude }}</p>
@@ -60,9 +58,7 @@ Landing page for user to input city/country or latitude/longitude coordinates.
                         <button type='submit'>Remove</button>
                       </form>
                     </div> 
-                  </li>
                 {% endfor %}
-              </ul>
             {% else %}
               <p>No favorite locations saved.</p>
             {% endif %}
