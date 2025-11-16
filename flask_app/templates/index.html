@@ -280,7 +280,12 @@ Landing page for user to input city/country or latitude/longitude coordinates.
           alert("Email cannot be empty");
           return;
         }
-        // TODO: add email format validation
+        
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+          alert("Invalid email format");
+          return;
+        }
 
         const username = document.getElementById("unameSignup").value;
         if (!username) {
