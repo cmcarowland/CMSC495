@@ -41,14 +41,12 @@ Landing page for user to input city/country or latitude/longitude coordinates.
           <div> 
             <h3>Favorite Locations</h3>
             {% if user.favorite_locations %}
-              <ul>
                 {% for loc in user.favorite_locations %}
-                  <li>
                     <div class="favorite-grid">
-                      <p id='lat'>{{ loc.latitude }}</p>
-                      <p id='lon'>{{ loc.longitude }}</p>
-                      <p id='name'>{{ loc.name }}{{ ', ' + loc.state if loc.state else "" }}</p>
-                      <p id='country'>{{ loc.country }}</p>
+                      <p>{{ loc.latitude }}</p>
+                      <p>{{ loc.longitude }}</p>
+                      <p>{{ loc.name }}{{ ', ' + loc.state if loc.state else "" }}</p>
+                      <p>{{ loc.country }}</p>
                       <form action='/submitCoord' method='post' class="centered">
                         <input type='hidden' name='latitude' value='{{ loc.latitude }}'/>
                         <input type='hidden' name='longitude' value='{{ loc.longitude }}'/>
@@ -60,9 +58,7 @@ Landing page for user to input city/country or latitude/longitude coordinates.
                         <button type='submit'>Remove</button>
                       </form>
                     </div> 
-                  </li>
                 {% endfor %}
-              </ul>
             {% else %}
               <p>No favorite locations saved.</p>
             {% endif %}
@@ -110,7 +106,7 @@ Landing page for user to input city/country or latitude/longitude coordinates.
       <div id="loginTab" class="tabcontent">
         <label for="emailLogin">Email </label>
         <input type="text" id="emailLogin" name="email">
-        <label for="pword">Password </label>
+        <label for="pwordLogin">Password </label>
         <input type="password" id="pwordLogin" name="pword">
         <button onclick="logintoServer()">Submit</button>
         <button onclick="closeLoginDialog()">Close</button>
