@@ -5,7 +5,7 @@ class User:
     Class representing a user in the application.
     """
     
-    def __init__(self, email, username, password_hash):
+    def __init__(self, email, username, password_hash, id=-1):
         """
         Initialize a new User instance.
         Args:
@@ -13,7 +13,7 @@ class User:
             username (str): The user's username.
             password_hash (str): The hashed password for the user.
         """
-        self.id = -1
+        self.id = id
         self.email = email
         self.user_name = username
         self.password_hash = password_hash
@@ -30,6 +30,7 @@ class User:
         return {
             'email': self.email,
             'username': self.user_name,
+            'id': self.id,
             'password_hash': self.password_hash,
             'favorite_locations': [loc.to_json() for loc in self.favorite_locations]
         }
@@ -61,6 +62,6 @@ class User:
             User: An instance of the User class.
         """
 
-        user = User(data['email'], data['username'], data['password_hash'])
+        user = User(data['email'], data['username'], data['password_hash'], data.get('id', -1))
         user.favorite_locations = [Location.from_json(loc) for loc in data.get('favorite_locations', [])]
         return user
