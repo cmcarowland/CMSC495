@@ -85,9 +85,9 @@ Landing page for user to input city/country or latitude/longitude coordinates.
           <label for="city">City</label>
           <input id="city" name="city" type="text" placeholder="e.g. Buffalo" />
           <label for="state">State</label>
-          <input id="state" name="state" type="text" placeholder="e.g. NY, Not required for non-USA" />
+          <input id="state" name="state" type="text" placeholder="e.g. NY, Not required for non-USA" maxlength="2" pattern="[A-Za-z]+" />
           <label for="country">Country</label>
-          <input id="country" name="country" type="text" placeholder="e.g. USA" />
+          <input id="country" name="country" type="text" placeholder="e.g. US" maxlength="2" pattern="[A-Za-z]+" />
           <button type="submit" class="form-button">Lookup</button>
         </form>
       </section>
