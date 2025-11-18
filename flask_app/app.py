@@ -99,10 +99,16 @@ def create_app():
         state = request.form.get('state')
         country = request.form.get('country')
 
+
         if not city and not state and not country:
             flash('Please provide a city, state (US), and country.', 'error')
             return redirect(url_for('index'))
 
+        for input in [city, state, country]:
+            if input and any(ch.isdigit() for ch in input):
+                flash("Input fields cannot contain numbers.", 'error')
+                return redirect(url_for('index'))
+            
         if country in ['US', 'USA', 'United States', 'United States of America']:
             if not state:
                 flash('Please provide a state for US locations.', 'error')
@@ -237,6 +243,7 @@ def create_app():
         except (TypeError, ValueError):
             flash('Invalid coordinates.', 'error')
             return redirect(url_for('index'))
+
         return query_hourly_forecast(latf, lonf)
     
     @app.route('/favorite', methods=['POST', 'OPTIONS'])
