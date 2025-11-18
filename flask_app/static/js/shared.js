@@ -17,7 +17,7 @@ function parseFlashedMessages(flashedMessages, dialog) {
     }
 }
 
-function addToFavorites(url, lat, lon, city_name, country) {
+function addToFavorites(url, lat, lon, city_name, state, country) {
     fetch(url, {
         method: "POST",
         headers: {
@@ -28,6 +28,7 @@ function addToFavorites(url, lat, lon, city_name, country) {
             lat: lat, 
             lon: lon, 
             name: city_name, 
+            state: state,
             country: country 
         })
     }).then(response => {

@@ -14,8 +14,8 @@ Creates GoldenHourData objects from API responses.
 from flask_app.golden_hour_data import GoldenHourData
 
 import requests
-import datetime
 import os
+import urllib.parse
 
 API_URL = f'http://api.openweathermap.org/'
 PRO_URL = 'https://pro.openweathermap.org/'
@@ -35,13 +35,13 @@ def query_location(city, state, country):
 
     url = f'{API_URL}{GEO_ENDPOINT}'
     if city:
-        url += f'{city}'
+        url += f'{urllib.parse.quote(city)}'
     if state:
         url += f',{state}'
     if country:
         url += f',{country}'
 
-    url += f'&limit=1&appid={OPENMAP_API_KEY}'
+    url += f'&limit=5&appid={OPENMAP_API_KEY}'
     response = requests.get(url)
     if response.status_code != 200:
         return None
@@ -127,4 +127,4 @@ def get_city_name(latitude, longitude):
     if data is None or len(data) == 0:
         return None
 
-    return data[0].get('name', 'Unknown')
+    return data[0]

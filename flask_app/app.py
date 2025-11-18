@@ -80,7 +80,8 @@ def create_app():
             return redirect(url_for('index'))
 
         user = get_auth_user(request)
-        return render_template('cityData.html', weather_data=weather_data, user=user)
+        city_info = api.get_city_name(latitude, longitude)
+        return render_template('cityData.html', weather_data=weather_data, user=user, city_info=city_info)
 
     @app.route('/submitCoord', methods=['POST'])
     def submit_coord():
@@ -131,6 +132,14 @@ def create_app():
         if data is None:
             flash('Location not found. Please try again.', 'error')
             return redirect(url_for('index'))
+        
+        for location in data:
+            if location['name'] == city:
+                data = [location]
+                break
+
+        if len(data) > 1:
+            return render_template('selectLocation.html', locations=data)
         
         longitude = data[0]['lon']
         latitude = data[0]['lat']
