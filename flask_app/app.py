@@ -69,7 +69,7 @@ def create_app():
         user = get_auth_user(request)
         return render_template('index.html', user=user)
 
-    def query_hourly_forecast(latitude, longitude):
+    def query_hourly_forecast(latitude, longitude, city_info=None):
         '''
         Queries the API for hourly weather data.
         '''
@@ -80,7 +80,9 @@ def create_app():
             return redirect(url_for('index'))
 
         user = get_auth_user(request)
-        city_info = api.get_city_name(latitude, longitude)
+        if city_info is None:
+            city_info = api.get_city_name(latitude, longitude)
+
         return render_template('cityData.html', weather_data=weather_data, user=user, city_info=city_info)
 
     @app.route('/submitCoord', methods=['POST'])
@@ -92,7 +94,7 @@ def create_app():
             flash('Please provide both latitude and longitude.', 'error')
             return redirect( url_for('index'))
         
-        return query_hourly_forecast(latitude, longitude)
+        return query_hourly_forecast(latitude, longitude, None)
 
     @app.route('/submitCity', methods=['POST'])
     def submit_city():
@@ -144,7 +146,7 @@ def create_app():
         longitude = data[0]['lon']
         latitude = data[0]['lat']
         
-        return query_hourly_forecast(latitude, longitude)
+        return query_hourly_forecast(latitude, longitude, data[0])
 
     @app.route('/login', methods=['POST'])
     def login():
