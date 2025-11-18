@@ -10,314 +10,291 @@ index.html
 Landing page for user to input city/country or latitude/longitude coordinates.
 -->
 
-<!doctype html>
-<html lang="en">
-  <head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width,initial-scale=1" />
-    <title>GoldenHour</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-    <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='resources/Sunapp.png') }}" />
-  </head>
-  <body>
-    <header class="site-header">
-      <img src="{{ url_for('static', filename='resources/Sunapp.png') }}" alt="Logo" class="logo" />
-      <h1>GoldenHour</h1>
-      <p class="tagline">Plan your outdoor activities by sunrise, sunset, and weather</p>
-    </header>
+{% extends 'base.html' %}
 
-    <header class="mobile-site-header">
-      <img src="{{ url_for('static', filename='resources/Sunapp.png') }}" alt="Logo" class="logo" />
-    </header>  
-    
-    <main class="container">
-      <section class="hero">
-        {% if not user %}
-          <button type="button" id="loginBtn" onclick="document.getElementById('loginDialog').showModal();">Login/Signup</button>
+{% block content %}
+  <section class="hero">
+    {% if not user %}
+      <button type="button" id="loginBtn" onclick="document.getElementById('loginDialog').showModal();">Login/Signup</button>
+    {% else %}
+      <label>Welcome, {{ user.user_name }}</label>
+      <br>
+      <button type="button" onclick="logUserOut()">Logout</button>
+      <div> 
+        <h3>Favorite Locations</h3>
+        {% if user.favorite_locations %}
+            {% for loc in user.favorite_locations %}
+                <div class="favorite-grid">
+                  <p>{{ loc.latitude }}</p>
+                  <p>{{ loc.longitude }}</p>
+                  <p>{{ loc.name }}{{ ', ' + loc.state if loc.state else "" }}</p>
+                  <p>{{ loc.country }}</p>
+                  <form action='/submitCoord' method='post' class="centered">
+                    <input type='hidden' name='latitude' value='{{ loc.latitude }}'/>
+                    <input type='hidden' name='longitude' value='{{ loc.longitude }}'/>
+                    <button type='submit'>View</button>
+                  </form>
+                  <form action='/removeFavorite' method='post' class="centered">
+                    <input type='hidden' name='latitude' value='{{ loc.latitude }}'/>
+                    <input type='hidden' name='longitude' value='{{ loc.longitude }}'/>
+                    <button type='submit'>Remove</button>
+                  </form>
+                </div> 
+            {% endfor %}
         {% else %}
-          <label>Welcome, {{ user.user_name }}</label>
-          <br>
-          <button type="button" onclick="logUserOut()">Logout</button>
-          <div> 
-            <h3>Favorite Locations</h3>
-            {% if user.favorite_locations %}
-                {% for loc in user.favorite_locations %}
-                    <div class="favorite-grid">
-                      <p>{{ loc.latitude }}</p>
-                      <p>{{ loc.longitude }}</p>
-                      <p>{{ loc.name }}{{ ', ' + loc.state if loc.state else "" }}</p>
-                      <p>{{ loc.country }}</p>
-                      <form action='/submitCoord' method='post' class="centered">
-                        <input type='hidden' name='latitude' value='{{ loc.latitude }}'/>
-                        <input type='hidden' name='longitude' value='{{ loc.longitude }}'/>
-                        <button type='submit'>View</button>
-                      </form>
-                      <form action='/removeFavorite' method='post' class="centered">
-                        <input type='hidden' name='latitude' value='{{ loc.latitude }}'/>
-                        <input type='hidden' name='longitude' value='{{ loc.longitude }}'/>
-                        <button type='submit'>Remove</button>
-                      </form>
-                    </div> 
-                {% endfor %}
-            {% else %}
-              <p>No favorite locations saved.</p>
-            {% endif %}
-          </div>
+          <p>No favorite locations saved.</p>
         {% endif %}
-      </section>
-      <br>
-      <section class="hero">
-        <p>Enter a latitude/longitude to get sunrise/sunset times and weather forecasts.</p>
-        <form action='/submitCoord' id="locForm" method="post" class="form-input-group">
-          <label for="latitude">Latitude</label>
-          <input id="latitude" name="latitude" type="text" placeholder="e.g. 38.9072" />
-          <label for="longitude">Longitude</label>
-          <input id="longitude" name="longitude" type="text" placeholder="e.g. -77.0369" />
-          <button type="submit" class="form-button">Lookup</button>
-        </form>
-        <br>
-        <button type="button" id="getLocationBtn">Get geolocation</button>
-      </section>
-      <br>
-      <section class="hero">
-        <p>Enter a city and country</p>
-        <form action='/submitCity' id="cityForm" method="post" class="form-input-group">
-          <label for="city">City</label>
-          <input id="city" name="city" type="text" placeholder="e.g. Buffalo" />
-          <label for="state">State</label>
-          <input id="state" name="state" type="text" placeholder="e.g. NY, Not required for non-USA" maxlength="2" pattern="[A-Za-z]+" />
-          <label for="country">Country</label>
-          <input id="country" name="country" type="text" placeholder="e.g. US" maxlength="2" pattern="[A-Za-z]+" />
-          <button type="submit" class="form-button">Lookup</button>
-        </form>
-      </section>
-    </main>
-
-    <dialog id="errorDialog" class="error-dialog">
-      <p id="dialogMessage"></p>
-      <button autofocus>Close</button>
-    </dialog>
-
-    <dialog id="loginDialog" class="login-dialog">
-      <div class="tab">
-        <button class="tablinks" onclick="changeTab(event, 'loginTab')">Login</button>
-        <button class="tablinks" onclick="changeTab(event, 'signupTab')">Signup</button>
       </div>
-      <div id="loginTab" class="tabcontent">
-        <label for="emailLogin">Email </label>
-        <input type="text" id="emailLogin" name="email">
-        <label for="pwordLogin">Password </label>
-        <input type="password" id="pwordLogin" name="pword">
-        <button onclick="logintoServer()">Submit</button>
-        <button onclick="closeLoginDialog()">Close</button>
-      </div>
-      <div id="signupTab" class="tabcontent">
-        <label for="emailSignup">Email </label>
-        <input type="text" id="emailSignup" name="email">
-        <label for="unameSignup">Username </label>
-        <input type="text" id="unameSignup" name="uname">
-        <label for="pwordSignup">Password </label>
-        <input type="password" id="pwordSignup" name="pword">
-        <label for="pword_confirm">Confirm Password </label>
-        <input type="password" id="pword_confirm" name="pword_confirm">
-        <button onclick="signup()">Submit</button>
-        <button onclick="closeLoginDialog()">Close</button>
-      </div>
-    </dialog>
+    {% endif %}
+  </section>
+  <br>
+  <section class="hero">
+    <p>Enter a latitude/longitude to get sunrise/sunset times and weather forecasts.</p>
+    <form action='/submitCoord' id="locForm" method="post" class="form-input-group">
+      <label for="latitude">Latitude</label>
+      <input id="latitude" name="latitude" type="text" placeholder="e.g. 38.9072" />
+      <label for="longitude">Longitude</label>
+      <input id="longitude" name="longitude" type="text" placeholder="e.g. -77.0369" />
+      <button type="submit" class="form-button">Lookup</button>
+    </form>
+    <br>
+    <button type="button" id="getLocationBtn">Get geolocation</button>
+  </section>
+  <br>
+  <section class="hero">
+    <p>Enter a city and country</p>
+    <form action='/submitCity' id="cityForm" method="post" class="form-input-group">
+      <label for="city">City</label>
+      <input id="city" name="city" type="text" placeholder="e.g. Buffalo" />
+      <label for="state">State</label>
+      <input id="state" name="state" type="text" placeholder="e.g. NY, Not required for non-USA" maxlength="2" pattern="[A-Za-z]+" />
+      <label for="country">Country</label>
+      <input id="country" name="country" type="text" placeholder="e.g. US" maxlength="2" pattern="[A-Za-z]+" />
+      <button type="submit" class="form-button">Lookup</button>
+    </form>
+  </section>
 
-    <footer>
-      <small>© 2025 GoldenHour for CMSC495</small>
-    </footer>
+  <dialog id="errorDialog" class="error-dialog">
+    <p id="dialogMessage"></p>
+    <button autofocus>Close</button>
+  </dialog>
 
-    <script src="{{ url_for('static', filename='js/shared.js') }}"></script>
-    <script>
-      const login = document.querySelector('#loginDialog');
+  <dialog id="loginDialog" class="login-dialog">
+    <div class="tab">
+      <button class="tablinks" onclick="changeTab(event, 'loginTab')">Login</button>
+      <button class="tablinks" onclick="changeTab(event, 'signupTab')">Signup</button>
+    </div>
+    <div id="loginTab" class="tabcontent">
+      <label for="emailLogin">Email </label>
+      <input type="text" id="emailLogin" name="email">
+      <label for="pwordLogin">Password </label>
+      <input type="password" id="pwordLogin" name="pword">
+      <button onclick="logintoServer()">Submit</button>
+      <button onclick="closeLoginDialog()">Close</button>
+    </div>
+    <div id="signupTab" class="tabcontent">
+      <label for="emailSignup">Email </label>
+      <input type="text" id="emailSignup" name="email">
+      <label for="unameSignup">Username </label>
+      <input type="text" id="unameSignup" name="uname">
+      <label for="pwordSignup">Password </label>
+      <input type="password" id="pwordSignup" name="pword">
+      <label for="pword_confirm">Confirm Password </label>
+      <input type="password" id="pword_confirm" name="pword_confirm">
+      <button onclick="signup()">Submit</button>
+      <button onclick="closeLoginDialog()">Close</button>
+    </div>
+  </dialog>
+{% endblock %}
 
-      function closeLoginDialog() {
-        login.close();
+{% block scripts %}
+  <script>
+    const login = document.querySelector('#loginDialog');
+
+    function closeLoginDialog() {
+      login.close();
+    }
+
+    const dialog = document.querySelector('#errorDialog');
+    const closeButton = dialog ? dialog.querySelector('button') : null;
+    closeButton?.addEventListener('click', () => {
+      dialog.close();
+    });
+
+    const flashedMessages = {{ get_flashed_messages(with_categories=true) | tojson }};
+    parseFlashedMessages(flashedMessages, dialog);
+
+    function showPosition(position) {
+      document.getElementById("latitude").value = position.coords.latitude;
+      document.getElementById("longitude").value = position.coords.longitude;
+    }
+
+    function showError(error) {
+      switch(error.code) {
+        case error.PERMISSION_DENIED:
+            alert("User denied the request for Geolocation.");
+            break;
+        case error.POSITION_UNAVAILABLE:
+            alert("Location information is unavailable.");
+            break;
+        case error.TIMEOUT:
+            alert("The request to get user location timed out.");
+            break;
+        case error.UNKNOWN_ERROR:
+            alert("An unknown error occurred.");
+            break;
       }
+    }
 
-      const dialog = document.querySelector('#errorDialog');
-      const closeButton = dialog ? dialog.querySelector('button') : null;
-      closeButton?.addEventListener('click', () => {
-        dialog.close();
+    document.getElementById('getLocationBtn').onclick = function() {
+      if (navigator.geolocation) {
+          console.log("Geolocation is supported by this browser.");
+          navigator.geolocation.getCurrentPosition(showPosition, showError);
+        } else {
+          console.log("Geolocation is not supported by this browser.");
+          alert("Geolocation is not supported by this browser.");
+        }
+    };
+
+    function hash(string) {
+      const utf8 = new TextEncoder().encode(string);
+      return crypto.subtle.digest('SHA-256', utf8).then((hashBuffer) => {
+        const hashArray = Array.from(new Uint8Array(hashBuffer));
+        const hashHex = hashArray.map(bytes => bytes.toString(16).padStart(2, '0')).join('');
+        return hashHex;
       });
+    }
 
-      const flashedMessages = {{ get_flashed_messages(with_categories=true) | tojson }};
-      parseFlashedMessages(flashedMessages, dialog);
-
-      function showPosition(position) {
-        document.getElementById("latitude").value = position.coords.latitude;
-        document.getElementById("longitude").value = position.coords.longitude;
-      }
-
-      function showError(error) {
-        switch(error.code) {
-          case error.PERMISSION_DENIED:
-              alert("User denied the request for Geolocation.");
-              break;
-          case error.POSITION_UNAVAILABLE:
-              alert("Location information is unavailable.");
-              break;
-          case error.TIMEOUT:
-              alert("The request to get user location timed out.");
-              break;
-          case error.UNKNOWN_ERROR:
-              alert("An unknown error occurred.");
-              break;
-        }
-      }
-
-      document.getElementById('getLocationBtn').onclick = function() {
-        if (navigator.geolocation) {
-            console.log("Geolocation is supported by this browser.");
-            navigator.geolocation.getCurrentPosition(showPosition, showError);
-          } else {
-            console.log("Geolocation is not supported by this browser.");
-            alert("Geolocation is not supported by this browser.");
-          }
-      };
-
-      function hash(string) {
-        const utf8 = new TextEncoder().encode(string);
-        return crypto.subtle.digest('SHA-256', utf8).then((hashBuffer) => {
-          const hashArray = Array.from(new Uint8Array(hashBuffer));
-          const hashHex = hashArray.map(bytes => bytes.toString(16).padStart(2, '0')).join('');
-          return hashHex;
-        });
-      }
-
-      function changeTab(evt, tabName) {
-        var i, tabcontent, tablinks;
-        tabcontent = document.getElementsByClassName("tabcontent");
-        for (i = 0; i < tabcontent.length; i++) {
-          if (tabcontent[i].id === "loginBase") {
-            continue;
-          }
-
-          tabcontent[i].style.display = "none";
+    function changeTab(evt, tabName) {
+      var i, tabcontent, tablinks;
+      tabcontent = document.getElementsByClassName("tabcontent");
+      for (i = 0; i < tabcontent.length; i++) {
+        if (tabcontent[i].id === "loginBase") {
+          continue;
         }
 
-        tablinks = document.getElementsByClassName("tablinks");
-        for (i = 0; i < tablinks.length; i++) {
-          if (tabcontent[i].id === "loginBase") {
-            continue;
-          }
-
-          tablinks[i].className = tablinks[i].className.replace(" active", "");
-        }
-
-        document.getElementById(tabName).style.display = "grid";
-        evt.currentTarget.className += " active";
+        tabcontent[i].style.display = "none";
       }
 
-      function logUserOut() {
-        fetch('/logout', {
+      tablinks = document.getElementsByClassName("tablinks");
+      for (i = 0; i < tablinks.length; i++) {
+        if (tabcontent[i].id === "loginBase") {
+          continue;
+        }
+
+        tablinks[i].className = tablinks[i].className.replace(" active", "");
+      }
+
+      document.getElementById(tabName).style.display = "grid";
+      evt.currentTarget.className += " active";
+    }
+
+    function logUserOut() {
+      fetch('/logout', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' }
+      }).then(() => {
+        window.location.reload();
+      }).catch((err) => {
+        alert('Network error: ' + err.message);
+      });
+    }
+
+    async function logintoServer(evt) {
+      const email = document.getElementById("emailLogin").value;
+      if (!email) {
+        alert("Email cannot be empty");
+        return;
+      }
+      
+      const password = document.getElementById("pwordLogin").value;
+      if (!password) {
+        alert("Password cannot be empty");
+        return;
+      }
+
+      const combined = email + ":" + await hash(password);
+      const b64encoded = btoa(combined);
+      try {
+        const resp = await fetch('/login', {
           method: 'POST',
-          headers: { 'Content-Type': 'application/json' }
-        }).then(() => {
-          window.location.reload();
-        }).catch((err) => {
-          alert('Network error: ' + err.message);
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ auth: b64encoded })
         });
+
+        // on success, close dialog and navigate / refresh
+        login.close();
+        const data = await resp.json().catch(() => null);
+        if (data && data.redirect) {
+          window.location.href = data.redirect;
+        } else {
+          window.location.reload();
+        }
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
+    }
+
+    async function signup(evt) {
+      const password = document.getElementById("pwordSignup").value;
+      if (!password) {
+        alert("Password cannot be empty");
+        return;
       }
 
-      async function logintoServer(evt) {
-        const email = document.getElementById("emailLogin").value;
-        if (!email) {
-          alert("Email cannot be empty");
-          return;
-        }
-        
-        const password = document.getElementById("pwordLogin").value;
-        if (!password) {
-          alert("Password cannot be empty");
-          return;
-        }
-
-        const combined = email + ":" + await hash(password);
-        const b64encoded = btoa(combined);
-        try {
-          const resp = await fetch('/login', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ auth: b64encoded })
-          });
-
-          // on success, close dialog and navigate / refresh
-          login.close();
-          const data = await resp.json().catch(() => null);
-          if (data && data.redirect) {
-            window.location.href = data.redirect;
-          } else {
-            window.location.reload();
-          }
-        } catch (err) {
-          alert('Network error: ' + err.message);
-        }
+      const password2 = document.getElementById("pword_confirm").value;
+      if (!password2) {
+        alert("Password confirmation cannot be empty");
+        return;
       }
 
-      async function signup(evt) {
-        const password = document.getElementById("pwordSignup").value;
-        if (!password) {
-          alert("Password cannot be empty");
-          return;
-        }
-
-        const password2 = document.getElementById("pword_confirm").value;
-        if (!password2) {
-          alert("Password confirmation cannot be empty");
-          return;
-        }
-
-        if (password !== password2) {
-          alert("Passwords do not match");
-          return;
-        }
-
-        const email = document.getElementById("emailSignup").value;
-        if (!email) {
-          alert("Email cannot be empty");
-          return;
-        }
-        
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-          alert("Invalid email format");
-          return;
-        }
-
-        const username = document.getElementById("unameSignup").value;
-        if (!username) {
-          alert("Username cannot be empty");
-          return;
-        }
-        
-        const combined = email + ":" + username + ":" + await hash(password);
-        const b64encoded = btoa(combined);
-        try {
-          const resp = await fetch('/signup', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ auth: b64encoded })
-          });
-
-          // on success, close dialog and navigate / refresh
-          login.close();
-          const data = await resp.json().catch(() => null);
-          if (data && data.redirect) {
-            window.location.href = data.redirect;
-          } else {
-            window.location.reload();
-          }
-        } catch (err) {
-          alert('Network error: ' + err.message);
-        }
+      if (password !== password2) {
+        alert("Passwords do not match");
+        return;
       }
 
-      document.addEventListener("DOMContentLoaded", function() {
-        document.querySelector(".tablinks").click();
-      });
-    </script>
-  </body>
-</html>
+      const email = document.getElementById("emailSignup").value;
+      if (!email) {
+        alert("Email cannot be empty");
+        return;
+      }
+      
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!emailRegex.test(email)) {
+        alert("Invalid email format");
+        return;
+      }
+
+      const username = document.getElementById("unameSignup").value;
+      if (!username) {
+        alert("Username cannot be empty");
+        return;
+      }
+      
+      const combined = email + ":" + username + ":" + await hash(password);
+      const b64encoded = btoa(combined);
+      try {
+        const resp = await fetch('/signup', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ auth: b64encoded })
+        });
+
+        // on success, close dialog and navigate / refresh
+        login.close();
+        const data = await resp.json().catch(() => null);
+        if (data && data.redirect) {
+          window.location.href = data.redirect;
+        } else {
+          window.location.reload();
+        }
+      } catch (err) {
+        alert('Network error: ' + err.message);
+      }
+    }
+
+    document.addEventListener("DOMContentLoaded", function() {
+      document.querySelector(".tablinks").click();
+    });
+  </script>
+{% endblock %}
