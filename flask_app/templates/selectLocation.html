@@ -11,69 +11,48 @@ Handles the display of multiple location options
 for user selection when multiple matches are found.
 -->
 
-<!doctype html>
-<html lang="en">
-    <head>
-        <meta charset="utf-8" />
-        <meta name="viewport" content="width=device-width,initial-scale=1" />
-        <title>GoldenHour</title>
-        <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}" />
-        <link rel="icon" type="image/svg+xml" href="{{ url_for('static', filename='resources/Sunapp.png') }}" />
-    </head>
-    <body>
-    <header class="site-header">
-        <a href="/">
-            <img src="{{ url_for('static', filename='resources/Sunapp.png') }}" alt="Logo" class="logo" />
-        </a>
-        <h1>GoldenHour</h1>
-        <p class="tagline">Plan your outdoor activities by sunrise, sunset, and weather</p>
-    </header>
+{% extends "base.html" %}
+{% block title %}Select Location - GoldenHour{% endblock %}
 
-    <header class="mobile-site-header">
-        <a href="/">
-            <img src="{{ url_for('static', filename='resources/Sunapp.png') }}" alt="Logo" class="logo" />
-        </a>
-    </header>
+{% block content %}
+    <section class="hero">
+      <h3 class="centered">Please Select The Location You Are Looking For</h3>
+          <div class="favorite-grid">  
+              <h4 class="centered">Latitude</h4>
+              <h4 class="centered">Longitude</h4>
+              <h4 class="centered">City</h4>
+              <h4 class="centered">State</h4>
+              <h4 class="centered">Country</h4>
+              <h4 class="centered">Action</h4>
+          </div>
+          <hr width="99%"/>
+          {% if locations %}
+              {% for loc in locations %}
+                  <div class="favorite-grid">
+                    <p class="centered">{{ "{:.4f}".format(loc['lat']) }}</p>
+                    <p class="centered">{{ "{:.4f}".format(loc['lon']) }}</p>
+                    <p class="centered">{{ loc['name'] }} </p> 
+                    <p class="centered">{{ loc['state'] if loc['state'] else "" }}</p>
+                    <p class="centered">{{ loc['country'] }}</p>
+                    <form action='/submitCoord' method='post' class="centered">
+                      <input type='hidden' name='latitude' value='{{ loc['lat'] }}'/>
+                      <input type='hidden' name='longitude' value='{{ loc['lon'] }}'/>
+                      <button type='submit'>View</button>
+                    </form>
+                  </div> 
+              {% endfor %}
+          {% else %}
+            <p>No favorite locations saved.</p>
+          {% endif %}
+    </section>
+    <br>
+    <button id="back">Go Back</button>
+{% endblock %}
 
-    <main class="container">
-      <section class="hero">
-        <h3 class="centered">Please Select The Location You Are Looking For</h3>
-            <div class="favorite-grid">  
-                <h4 class="centered">Latitude</h4>
-                <h4 class="centered">Longitude</h4>
-                <h4 class="centered">City</h4>
-                <h4 class="centered">State</h4>
-                <h4 class="centered">Country</h4>
-                <h4 class="centered">Action</h4>
-            </div>
-            <hr width="99%"/>
-            {% if locations %}
-                {% for loc in locations %}
-                    <div class="favorite-grid">
-                      <p class="centered">{{ "{:.4f}".format(loc['lat']) }}</p>
-                      <p class="centered">{{ "{:.4f}".format(loc['lon']) }}</p>
-                      <p class="centered">{{ loc['name'] }} </p> 
-                      <p class="centered">{{ loc['state'] if loc['state'] else "" }}</p>
-                      <p class="centered">{{ loc['country'] }}</p>
-                      <form action='/submitCoord' method='post' class="centered">
-                        <input type='hidden' name='latitude' value='{{ loc['lat'] }}'/>
-                        <input type='hidden' name='longitude' value='{{ loc['lon'] }}'/>
-                        <button type='submit'>View</button>
-                      </form>
-                    </div> 
-                {% endfor %}
-            {% else %}
-              <p>No favorite locations saved.</p>
-            {% endif %}
-      </section>
-      <br>
-      <button id="back">Go Back</button>
-    </main>
-
-    <script>
-      document.querySelector('#back').addEventListener('click', function() {
-        window.location.href = "{{ url_for('index') }}";
-      });
-    </script>
-    </body>
-</html>
+{% block scripts %}
+  <script>
+    document.querySelector('#back').addEventListener('click', function() {
+      window.location.href = "{{ url_for('index') }}";
+    });
+  </script>
+{% endblock %}
