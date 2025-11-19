@@ -1,3 +1,15 @@
+'''
+Golden Hour App Group 1
+UMGC CMSC 495 7385
+Shivam Patel, Raymond Rowland, Mariam Ahmed, Katrina Wilhelm, Paul Cooper
+November 5, 2025
+
+user.py
+
+Defines the User Class representing application users
+Provides methods to serialize and deserialize user data, and remove favorite locations.
+'''
+
 from flask_app.location import Location
 
 class User:

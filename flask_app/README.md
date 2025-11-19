@@ -37,7 +37,7 @@ OR to use the install script
 # This will create a .env file with our secret simplyifying testing and execution
 echo "OPEN_WEATHER_MAP_API_KEY={APIKEY}" > .env
 # This starts the flask server
-python -m flask_app/app.py
+python -m flask_app
 ```
 
 3. Open http://localhost:5000 in your browser.
