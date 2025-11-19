@@ -256,6 +256,6 @@ class GoldenHourData:
         utc_dt = datetime.datetime.fromtimestamp(timestamp, tz=datetime.timezone.utc)
         local_dt = utc_dt.astimezone(local_timezone)
         
-        formatted_time = local_dt.strftime("%H:%M:%S")
+        formatted_time = local_dt.strftime("%I:%M:%S %p")
 
         return formatted_time
