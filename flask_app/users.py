@@ -1,3 +1,16 @@
+'''
+Golden Hour App Group 1
+UMGC CMSC 495 7385
+Shivam Patel, Raymond Rowland, Mariam Ahmed, Katrina Wilhelm, Paul Cooper
+November 5, 2025
+
+users.py
+
+Defines the Users class for managing multiple User objects.
+Loads and saves user data from JSON, manages authentication,
+and creates or retrieves users.
+'''
+
 from flask_app.user import User
 
 import json
