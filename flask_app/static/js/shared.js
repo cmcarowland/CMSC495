@@ -46,27 +46,39 @@ Parameters:
 - state: State of the location.
 - country: Country of the location.
 */
-function updateFavorites(url, lat, lon, city_name, state, country) {
-    fetch(url, {
-        method: "POST",
-        headers: {
-        "Content-Type": "application/json"
-        },
-        body: JSON.stringify(
-        { 
-            lat: lat, 
-            lon: lon, 
-            name: city_name, 
-            state: state,
-            country: country 
-        })
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.action === 'removed') {
-            document.getElementById("favorite_button").src = "./static/resources/icon_star_round_outline.png";
-        }else if (data.action === 'added') {
-            document.getElementById("favorite_button").src = "./static/resources/icon_star_round.png";                
+async function updateFavorites(url, lat, lon, name, state, country) {
+    try {
+        // Send update
+        const response = await fetch(url, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                lat: lat,
+                lon: lon,
+                name: name,
+                state: state,
+                country: country
+            })
+        });
+
+        const data = await response.json();
+        const favButton = document.getElementById("favorite-button");
+        const favLocationsDiv = document.getElementById("favorite-locations");
+
+        if (favButton) {
+
+            favButton.src = 
+                data.action === "removed"
+                ? "./static/resources/icon_star_round_outline.png"
+                : "./static/resources/icon_star_round.png";
+
+            return;   
+        } else if (favLocationsDiv) {
+            const res = await fetch("/renderFavorites");
+            const htmlData = await res.json();
+            favLocationsDiv.innerHTML = htmlData.html;
         }
-    });
+    } catch (err) {
+        console.error("Error:", err);
+    }
 }
