@@ -20,30 +20,8 @@ Landing page for user to input city/country or latitude/longitude coordinates.
       <label>Welcome, {{ user.user_name }}</label>
       <br>
       <button type="button" onclick="logUserOut()">Logout</button>
-      <div> 
-        <h3>Favorite Locations</h3>
-        {% if user.favorite_locations %}
-            {% for loc in user.favorite_locations %}
-                <div class="favorite-grid">
-                  <p>{{ loc.latitude }}</p>
-                  <p>{{ loc.longitude }}</p>
-                  <p>{{ loc.name }}{{ ', ' + loc.state if loc.state else "" }}</p>
-                  <p>{{ loc.country }}</p>
-                  <form action='/submitCoord' method='post' class="centered">
-                    <input type='hidden' name='latitude' value='{{ loc.latitude }}'/>
-                    <input type='hidden' name='longitude' value='{{ loc.longitude }}'/>
-                    <button type='submit'>View</button>
-                  </form>
-                  <form action='/removeFavorite' method='post' class="centered">
-                    <input type='hidden' name='latitude' value='{{ loc.latitude }}'/>
-                    <input type='hidden' name='longitude' value='{{ loc.longitude }}'/>
-                    <button type='submit'>Remove</button>
-                  </form>
-                </div> 
-            {% endfor %}
-        {% else %}
-          <p>No favorite locations saved.</p>
-        {% endif %}
+      <div id="favorite-locations"> 
+        {% include "favoriteLocations.html" %}
       </div>
     {% endif %}
   </section>

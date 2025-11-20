@@ -1,0 +1,25 @@
+<h3>Favorite Locations</h3>
+{% if user.favorite_locations %}
+    {% for loc in user.favorite_locations %}
+        <div class="favorite-grid">
+            <p>{{ loc.latitude }}</p>
+            <p>{{ loc.longitude }}</p>
+            <p>{{ loc.name }}{{ ', ' + loc.state if loc.state else "" }}</p>
+            <p>{{ loc.country }}</p>
+            <form action='/submitCoord' method='post' class="centered">
+                <input type='hidden' name='latitude' value='{{ loc.latitude }}'/>
+                <input type='hidden' name='longitude' value='{{ loc.longitude }}'/>
+                <button type='submit'>View</button>
+            </form>
+            <div class="centered">
+                <button 
+                    onclick="updateFavorites('{{ url_for('favorite') }}', {{ loc.latitude}}, {{ loc.longitude }}, '{{ loc.name }}', '{{ loc.state if loc.state else "" }}', '{{ loc.country }}')"
+                >
+                Remove
+                </button>
+            </div>
+        </div> 
+    {% endfor %}
+{% else %}
+    <p>No favorite locations saved.</p>
+{% endif %}
