@@ -20,22 +20,24 @@ Quick start
 
 1. Create and activate a virtualenv (recommended):
 
+Use the install script
+```bash
+source install.sh <API_KEY>
+```
+
+Or manually enter
 ```bash
 python -m venv .venv
 source .venv/bin/activate
 pip install --upgrade pip
 pip install -r flask_app/requirements.txt
-```
-OR to use the install script
-```bash
-. install.sh
+# This will create a .env file with our secret simplyifying testing and execution
+echo "OPEN_WEATHER_MAP_API_KEY={APIKEY}" > .env
 ```
 
 2. Run the server:
 
 ```bash
-# This will create a .env file with our secret simplyifying testing and execution
-echo "OPEN_WEATHER_MAP_API_KEY={APIKEY}" > .env
 # This starts the flask server
 python -m flask_app
 ```
