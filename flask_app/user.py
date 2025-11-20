@@ -47,7 +47,23 @@ class User:
             'favorite_locations': [loc.to_json() for loc in self.favorite_locations]
         }
     
-    def remove_favorite_location(self, latitude, longitude):
+    def add_favorite_location(self, location) -> bool:
+        """
+        Add a favorite location to the user's list.
+        Args:
+            location (Location): The Location instance to add.
+        Returns:
+            bool: True if the location was added, False if it was already in favorites.
+        """
+
+        for loc in self.favorite_locations:
+            if loc.latitude == location.latitude and loc.longitude == location.longitude:
+                return False
+            
+        self.favorite_locations.append(location)
+        return True
+    
+    def remove_favorite_location(self, latitude, longitude) -> bool:
         """
         Remove a favorite location by latitude and longitude.
         Args:

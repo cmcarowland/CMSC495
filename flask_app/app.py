@@ -13,7 +13,7 @@ Handles Flask application routes and rendering templates.
 from flask_app.users import Users
 from flask_app import api
 from flask_app.location import Location
-from flask import Flask, render_template, request, redirect, url_for, flash, make_response
+from flask import Flask, jsonify, render_template, request, redirect, url_for, flash, make_response
 
 from dotenv import load_dotenv
 from datetime import datetime, timezone
@@ -356,44 +356,19 @@ def create_app():
         loc_data = json.loads(data)
         location = Location.from_json(loc_data)
         if is_location_favorited(user, location.latitude, location.longitude):
-            flash('Location is already in favorites.', 'info')
-            return redirect(url_for('index'))
-
-        user.favorite_locations.append(location)
-        users_instance.save()
-        return redirect(url_for('city', latitude=location.latitude, longitude=location.longitude))
-    
-    @app.route('/removeFavorite', methods=['POST'])
-    def remove_favorite():
-        """
-        Remove a location from the user's favorites.
-        Returns:
-            A redirect response to the index page or city page with an error message.
-        """
-
-        user = get_auth_user(request)
-        if not user:
-            flash('You must be logged in to remove a favorite location.', 'error')
-            return redirect(url_for('index'))
-
-        try:
-            lat = float(request.form.get('latitude'))
-            lon = float(request.form.get('longitude'))
-        except (TypeError, ValueError):
-            flash('Invalid latitude or longitude.', 'error')
-            return redirect(url_for('index'))
-        
-        if not is_location_favorited(user, lat, lon):
-            flash('Location is not in favorites.', 'error')
-            return redirect(url_for('index'))
-        
-        user.remove_favorite_location(lat, lon)
-        users_instance.save()
-        
-        if request.referrer.endswith('/'):
-            return redirect(url_for('index'))
+            if user.remove_favorite_location(location.latitude, location.longitude):
+                users_instance.save()
+                return jsonify({"action": 'removed'}), 200
+            else:
+                flash('Failed to remove favorite location.', 'error')
+                return make_response('', 400)
         else:
-            return query_hourly_forecast(lat, lon)
+            if user.add_favorite_location(location):
+                users_instance.save()
+                return jsonify({"action": 'added'}), 200
+            else:
+                flash('Failed to add favorite location.', 'error')
+                return make_response('', 400)
     
     # Register global template functions so they can be used in Jinja2 templates
     app.jinja_env.globals['get_auth_user_name'] = get_auth_user_name
