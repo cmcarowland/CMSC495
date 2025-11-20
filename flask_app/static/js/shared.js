@@ -18,7 +18,6 @@ Parameters:
 - dialog: The dialog element to display messages.
 */
 function parseFlashedMessages(flashedMessages, dialog) {
-    console.log("flashedMessages");
     if (flashedMessages.length > 0) {
         for (const [category, message] of flashedMessages) {
             if (category === 'error') {
@@ -38,7 +37,7 @@ function parseFlashedMessages(flashedMessages, dialog) {
 }
 
 /*
-Function to add a location to favorites via a POST request.
+Function to add/remove a location to favorites via a POST request.
 Parameters:
 - url: The endpoint URL to send the POST request to.
 - lat: Latitude of the location.
@@ -47,7 +46,7 @@ Parameters:
 - state: State of the location.
 - country: Country of the location.
 */
-function addToFavorites(url, lat, lon, city_name, state, country) {
+function updateFavorites(url, lat, lon, city_name, state, country) {
     fetch(url, {
         method: "POST",
         headers: {
@@ -61,9 +60,13 @@ function addToFavorites(url, lat, lon, city_name, state, country) {
             state: state,
             country: country 
         })
-    }).then(response => {
-        if (response.redirected) {
-            window.location.href = response.url;
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.action === 'removed') {
+            document.getElementById("favorite_button").src = "./static/resources/icon_star_round_outline.png";
+        }else if (data.action === 'added') {
+            document.getElementById("favorite_button").src = "./static/resources/icon_star_round.png";                
         }
     });
 }
