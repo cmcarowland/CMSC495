@@ -355,6 +355,7 @@ def create_app():
         data = request.data.decode('utf-8')
         loc_data = json.loads(data)
         location = Location.from_json(loc_data)
+    
         if is_location_favorited(user, location.latitude, location.longitude):
             if user.remove_favorite_location(location.latitude, location.longitude):
                 users_instance.save()
@@ -369,6 +370,12 @@ def create_app():
             else:
                 flash('Failed to add favorite location.', 'error')
                 return make_response('', 400)
+            
+    @app.route('/renderFavorites', methods=['GET'])
+    def render_favorites():
+        user = get_auth_user(request)
+        html = render_template("favoriteLocations.html", user=user)
+        return jsonify({"html": html})
     
     # Register global template functions so they can be used in Jinja2 templates
     app.jinja_env.globals['get_auth_user_name'] = get_auth_user_name
