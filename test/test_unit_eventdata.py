@@ -1,3 +1,15 @@
+'''
+Golden Hour App Group 1
+UMGC CMSC 495 7385
+Shivam Patel, Raymond Rowland, Mariam Ahmed, Katrina Wilhelm, Paul Cooper
+November 20, 2025
+
+test_unit_eventdata.py
+
+Unit tests for the EventData class.
+Tests various conditions and scoring calculations.
+'''
+
 from flask_app.golden_hour_data import EventData
 
 def test_event_score():

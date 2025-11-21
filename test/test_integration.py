@@ -1,3 +1,14 @@
+'''
+Golden Hour App Group 1
+UMGC CMSC 495 7385
+Shivam Patel, Raymond Rowland, Mariam Ahmed, Katrina Wilhelm, Paul Cooper
+November 21, 2025
+
+test_integration.py
+
+Integration tests for the Flask application.
+Tests various routes and functionalities of the app.'''
+
 import shutil
 from flask_app import api
 from flask_app.golden_hour_data import EventData

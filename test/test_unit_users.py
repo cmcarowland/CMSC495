@@ -1,3 +1,16 @@
+'''
+Golden Hour App Group 1
+UMGC CMSC 495 7385
+Shivam Patel, Raymond Rowland, Mariam Ahmed, Katrina Wilhelm, Paul Cooper
+November 20, 2025
+
+test_unit_users.py
+
+Unit tests for the User and Users classes.
+Tests user creation, serialization, favorite location management,
+and user authentication.
+'''
+
 from flask_app.user import User
 from flask_app.location import Location
 from flask_app.users import Users
