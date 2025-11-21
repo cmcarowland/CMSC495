@@ -1,10 +1,18 @@
-import pytest
+import shutil
 from flask_app import api
 from flask_app.golden_hour_data import EventData
 from flask_app.app import create_app
+from flask_app.users import Users
+
+import pytest
+import hashlib
+import base64
+import shutil
 
 @pytest.fixture
 def app_fixture():
+    shutil.copy("test/data/users.json", "test/users.json")
+    Users.FILENAME =  "test/users.json"
     appinst = create_app()
     appinst.config.update({
         "TESTING": True,
@@ -34,7 +42,6 @@ def test_city_data(client_dummy):
         'country': 'US'
     })
     assert response.status_code == 200
-    print(response.data)
     assert b'Los Angeles, California, US' in response.data
 
 def test_coord_data(client_dummy):
@@ -204,3 +211,160 @@ def test_location_query_bad_data():
 def test_location_query_bad_query():
     response = api.query_location(city='ThisCity,NoDataType=NotExist', state='ZZ', country='US')
     assert response is None
+
+def create_password_hash(password: str) -> str:
+    return hashlib.sha256(password.encode()).hexdigest()
+
+def test_login_no_account(client_dummy):
+    response = client_dummy.post('/login', json={
+        'auth': base64.b64encode(f'tester@example.com:{create_password_hash("Tester123")}'.encode()).decode(),
+    })
+
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Login failed.' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_signup(client_dummy):
+    response = client_dummy.post('/signup', json={
+        'auth': base64.b64encode(f'tester@example.com:Tester:{create_password_hash("Tester123")}'.encode()).decode()
+    })
+
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Signup successful.' in msg for category, msg in flashed_messages if category == 'success')
+
+def test_login_existing_account(client_dummy):
+    response = client_dummy.post('/signup', json={
+        'auth': base64.b64encode(f'tester2@example.com:Tester:{create_password_hash("Tester123")}'.encode()).decode()
+    })
+
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Signup failed.' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_login_successful_account(client_dummy):
+    response = client_dummy.post('/login', json={
+        'auth': base64.b64encode(f'tester2@example.com:{create_password_hash("Tester123")}'.encode()).decode()
+    })
+
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Login successful.' in msg for category, msg in flashed_messages if category == 'success')
+
+def test_login_wrong_password(client_dummy):
+    response = client_dummy.post('/login', json={
+        'auth': base64.b64encode(f'tester2@example.com:{create_password_hash("WrongPassword")}'.encode()).decode()
+    })
+
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Login failed.' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_logout_successful_account(client_dummy):
+    response = client_dummy.post('/login', json={
+        'auth': base64.b64encode(f'tester2@example.com:{create_password_hash("Tester123")}'.encode()).decode()
+    })
+
+    response = client_dummy.post('/logout')
+    assert response.status_code == 200
+
+def test_logout_without_login(client_dummy):
+        response = client_dummy.post('/logout')
+        with client_dummy.session_transaction() as session:
+            flashed_messages = session['_flashes']
+            assert any('Logout failed.' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_query_city(client_dummy):
+    response = client_dummy.get('/city',
+        query_string={'latitude': '38.9', 'longitude': '-77.1'}
+    )
+
+    assert response.status_code == 200
+    assert b'Arlington, Virginia, US' in response.data
+
+def test_query_city_bad_lat(client_dummy):
+    response = client_dummy.get('/city',
+        query_string={'latitude': 'ASDF', 'longitude': '-77.1'}
+    )
+
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Invalid coordinates' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_query_city_bad_lon(client_dummy):
+    response = client_dummy.get('/city',
+        query_string={'latitude': '38.9', 'longitude': 'ASDF'}
+    )
+
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Invalid coordinates' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_query_city_missing_lat(client_dummy):
+    response = client_dummy.get('/city',
+        query_string={'longitude': '-77.1'}
+    )
+
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Missing coordinates' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_query_city_missing_lon(client_dummy):
+    response = client_dummy.get('/city',
+        query_string={'latitude': '38.9'}
+    )
+
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('Missing coordinates' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_unauth_favorite_location_add(client_dummy):
+    response = client_dummy.post('/favorite', json={
+        'lat': 38.9,
+        'lon': -77.1,
+        'name': 'Arlington',
+        'state': 'VA',
+        'country': 'US'
+    })
+
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('You must be logged in to perform favorite actions.' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_unauth_favorite_location_remove(client_dummy):
+    response = client_dummy.post('/favorite', json={
+        'lat': 38.9,
+        'lon': -77.1
+    })
+
+    with client_dummy.session_transaction() as session:
+        flashed_messages = session['_flashes']
+        assert any('You must be logged in to perform favorite actions' in msg for category, msg in flashed_messages if category == 'error')
+
+def test_favorite_location_remove(client_dummy):
+    response = client_dummy.post('/login', json={
+        'auth': base64.b64encode(f'tester2@example.com:{create_password_hash("Tester123")}'.encode()).decode()
+    })
+
+    response = client_dummy.post('/favorite', json={
+        'lat': 33.4504,
+        'lon': -82.1982,
+    })
+
+    assert response.json['action'] == 'removed'
+
+def test_favorite_location_add(client_dummy):
+    response = client_dummy.post('/login', json={
+        'auth': base64.b64encode(f'tester2@example.com:{create_password_hash("Tester123")}'.encode()).decode()
+    })
+
+    response = client_dummy.post('/favorite', json={
+        'lat': '38.62684098373759',
+        'lon': '-90.19761349442946',
+        'name': 'St. Louis',
+        'state': 'MO',
+        'country': 'US'
+    })
+
+    assert response.status_code == 200
+    assert response.json['action'] == 'added'

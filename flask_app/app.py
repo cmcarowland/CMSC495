@@ -89,23 +89,6 @@ def create_app():
                 return users_instance.authenticated[req.cookies['auth']]
 
         return None
-    
-    def is_location_favorited(user, latitude, longitude) -> bool:
-        """
-        Check if a location is in the user's favorite locations.
-        Args:
-            user (User): The user object.
-            latitude (float): The latitude of the location.
-            longitude (float): The longitude of the location.
-        Returns:
-            bool: True if the location is favorited, False otherwise.
-        """
-
-        for loc in user.favorite_locations:
-            if loc.latitude == latitude and loc.longitude == longitude:
-                return True
-            
-        return False
 
     @app.route('/')
     def index():
@@ -228,11 +211,10 @@ def create_app():
         Returns:
             A redirect response to the index page with a success or error message.
         """
-
+    
         auth = request.data.decode('utf-8')
         data = json.loads(auth)        
         email, pw_hash = base64.b64decode(data['auth']).decode('utf-8').split(':')
-
         user = users_instance.get_user(email)
         if user: 
             if users_instance.login(email, pw_hash):
@@ -270,6 +252,7 @@ def create_app():
             return redirect(url_for('index'), code=401)
         
         if users_instance.add_user(email, user_name, pw_hash):
+            users_instance.save()
             c = cookie()
             resp = make_response(redirect(url_for('index')), 200)
             resp.set_cookie('auth', c)
@@ -349,14 +332,13 @@ def create_app():
 
         user = get_auth_user(request)
         if not user:
-            flash('You must be logged in to favorite a location.', 'error')
+            flash('You must be logged in to perform favorite actions.', 'error')
             return redirect(url_for('index'))
 
         data = request.data.decode('utf-8')
         loc_data = json.loads(data)
         location = Location.from_json(loc_data)
-    
-        if is_location_favorited(user, location.latitude, location.longitude):
+        if user.is_location_favorited(location.latitude, location.longitude):
             if user.remove_favorite_location(location.latitude, location.longitude):
                 users_instance.save()
                 return jsonify({"action": 'removed'}), 200
@@ -380,7 +362,6 @@ def create_app():
     # Register global template functions so they can be used in Jinja2 templates
     app.jinja_env.globals['get_auth_user_name'] = get_auth_user_name
     app.jinja_env.globals['get_auth_user_id'] = get_auth_user_id
-    app.jinja_env.globals['is_location_favorited'] = is_location_favorited
     return app
 
 

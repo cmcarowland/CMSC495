@@ -46,6 +46,28 @@ class User:
             'password_hash': self.password_hash,
             'favorite_locations': [loc.to_json() for loc in self.favorite_locations]
         }
+
+    def is_location_favorited(self, latitude, longitude) -> Location | None:
+        """
+        Check if a location is in the user's favorite locations.
+        Args:
+            latitude (float): The latitude of the location.
+            longitude (float): The longitude of the location.
+        Returns:
+            Location : The location found in favorites
+        """
+
+        try:
+            latitude = float(latitude)
+            longitude = float(longitude)
+        except ValueError:
+            return None
+
+        for loc in self.favorite_locations:
+            if loc.latitude == latitude and loc.longitude == longitude:
+                return loc
+            
+        return None
     
     def add_favorite_location(self, location) -> bool:
         """
@@ -55,10 +77,10 @@ class User:
         Returns:
             bool: True if the location was added, False if it was already in favorites.
         """
-
-        for loc in self.favorite_locations:
-            if loc.latitude == location.latitude and loc.longitude == location.longitude:
-                return False
+        
+        loc = self.is_location_favorited(location.latitude, location.longitude)
+        if loc is not None:
+            return False
             
         self.favorite_locations.append(location)
         return True
@@ -73,10 +95,10 @@ class User:
             bool: True if the location was found and removed, False otherwise.
         """
 
-        for loc in self.favorite_locations:
-            if loc.latitude == latitude and loc.longitude == longitude:
-                self.favorite_locations.remove(loc)
-                return True
+        loc = self.is_location_favorited(latitude, longitude)
+        if loc:
+            self.favorite_locations.remove(loc)
+            return True
         
         return False
     

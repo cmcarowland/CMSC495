@@ -27,6 +27,9 @@ class Location:
         self.latitude = latitude
         self.longitude = longitude
 
+    def __repr__(self):
+        return f"Location(name={self.name}, state={self.state}, country={self.country}, lat={self.latitude}, lon={self.longitude})"
+
     @staticmethod
     def from_json(data):
         """

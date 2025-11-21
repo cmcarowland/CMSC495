@@ -116,7 +116,6 @@ class Users:
         user.id = Users.get_next_id()
 
         self.users.append(user)
-        self.save()
         return True
 
     def login(self, email : str, pw : str) -> bool:
