@@ -30,9 +30,9 @@ Landing page for user to input city/country or latitude/longitude coordinates.
     <p>Enter a latitude/longitude to get sunrise/sunset times and weather forecasts.</p>
     <form action='/submitCoord' id="locForm" method="post" class="form-input-group">
       <label for="latitude">Latitude</label>
-      <input id="latitude" name="latitude" type="text" placeholder="e.g. 38.9072" />
+      <input id="latitude" name="latitude" type="number" placeholder="e.g. 38.9072" />
       <label for="longitude">Longitude</label>
-      <input id="longitude" name="longitude" type="text" placeholder="e.g. -77.0369" />
+      <input id="longitude" name="longitude" type="number" placeholder="e.g. -77.0369" />
       <button type="submit" class="form-button">Lookup</button>
     </form>
     <br>
