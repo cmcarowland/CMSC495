@@ -119,6 +119,9 @@ def create_app():
         user = get_auth_user(request)
         if city_info is None:
             city_info = api.get_city_name(latitude, longitude)
+            if city_info is None:
+                city_info = {"name": weather_data.city_name, "state": "", "country": weather_data.country, "lat": latitude, "lon": longitude}
+
 
         return render_template('weather_grid.html', weather_data=weather_data, city_info=city_info, user=user), 200
     
