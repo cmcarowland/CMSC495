@@ -1,0 +1,9 @@
+<div>
+    {% if weather_data and weather_data.coordinates %}
+        <h3 class="centered">No location data found for the provided coordinates</h3>
+        <p class="centered">Latitude: {{ weather_data.coordinates[0] }} Longitude: {{ weather_data.coordinates[1] }}</p>
+    {% else %}
+        <h3 class="centered">No location found for the provided location.</h3>
+        <p class="centered">Please check your input and try again.</p>
+    {% endif %}
+</div>

@@ -57,6 +57,13 @@ body{
     position: relative;
 }
 
+.hero.error {
+  background-color: var(--error-bg);
+  border-color: white;
+  border-style: solid;
+  color: white;
+}
+
 .form-input-group {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -110,6 +117,14 @@ footer{
   justify-content: center;
   align-items: center;
   height: 100%;
+}
+
+.centered-div{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  margin: 16px 0px;
 }
 
 .golden {
