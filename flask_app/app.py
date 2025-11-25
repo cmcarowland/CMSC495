@@ -114,14 +114,40 @@ def create_app():
 
         weather_data = api.query_hourly_forecast(latitude, longitude)
         if weather_data is None:
-            flash('Location not found. Please try again.', 'error')
-            return redirect(url_for('index'))
+            return render_template('invalid_location.html', weather_data={"coordinates": (latitude, longitude)}), 204
 
         user = get_auth_user(request)
         if city_info is None:
             city_info = api.get_city_name(latitude, longitude)
 
-        return render_template('cityData.html', weather_data=weather_data, user=user, city_info=city_info)
+        return render_template('weather_grid.html', weather_data=weather_data, city_info=city_info, user=user), 200
+    
+    def get_city_data_quip():
+        """
+        Get a random quip about city data.
+        Returns:
+            str: A random quip string.
+        """
+
+        sun_quips = [
+            "Don’t worry, the sun's not the only thing that needs a warm-up. Data’s almost here!",
+            "This sun's got nothing on the data we're about to hit you with. Patience, sunshine!",
+            "Data loading faster than a sunbeam through a window. Well, almost... Hang tight!",
+            "If you think the sunrise is slow? Please. This data’s got more style than that golden hour glow!",
+            "You thought the sunrise was slow? Please.",
+            "Sun’s almost up, and so is your weather info! Just don’t blink, you might miss it!",
+            "Data’s like the sun, it’ll get here when it gets here—but when it does, it’ll light up your day!",
+            "Patience, friend. The sun isn’t the only thing that rises slowly—just wait for this perfect weather report!",
+            "I’d say this is as slow as waiting for a sunset, but who needs sunsets when you’ve got data like this?",
+            "The sun might be slow to rise, but don’t worry, your weather data will shine soon enough!",
+            "Like the sun’s first rays—data’s coming in hot. But for now, enjoy the anticipation!",
+            "Think of this as the calm before the storm... of perfect weather data. Coming right up!",
+            "Sunrise? Too slow. Data? A little faster—just hold on!",
+            "You know what’s slower than a sunrise? This API… But don’t worry, we’re almost there!",
+            "I promise, this data will shine brighter than the sun… but first, it’s gotta wake up!"
+        ]
+
+        return random.choice(sun_quips)
 
     @app.route('/submitCoord', methods=['POST'])
     def submit_coord():
@@ -140,7 +166,7 @@ def create_app():
             flash('Please provide both latitude and longitude.', 'error')
             return redirect( url_for('index'))
         
-        return query_hourly_forecast(latitude, longitude, None)
+        return render_template('cityData.html', latitude=latitude, longitude=longitude, quip=get_city_data_quip())
 
     @app.route('/submitCity', methods=['POST'])
     def submit_city():
@@ -156,7 +182,6 @@ def create_app():
         state = request.form.get('state')
         country = request.form.get('country')
 
-
         if not city and not state and not country:
             flash('Please provide a city, state (US), and country.', 'error')
             return redirect(url_for('index'))
@@ -166,7 +191,7 @@ def create_app():
                 flash("Input fields cannot contain numbers.", 'error')
                 return redirect(url_for('index'))
             
-        if country in ['US', 'USA', 'United States', 'United States of America']:
+        if country in ['US']:
             if not state:
                 flash('Please provide a state for US locations.', 'error')
                 return redirect(url_for('index'))
@@ -184,23 +209,7 @@ def create_app():
                 flash('Please provide a valid city.', 'error')
                 return redirect(url_for('index'))
 
-        data = api.query_location(city, state, country)
-        if data is None:
-            flash('Location not found. Please try again.', 'error')
-            return redirect(url_for('index'))
-        
-        for location in data:
-            if location['name'] == city:
-                data = [location]
-                break
-
-        if len(data) > 1:
-            return render_template('selectLocation.html', locations=data)
-        
-        longitude = data[0]['lon']
-        latitude = data[0]['lat']
-        
-        return query_hourly_forecast(latitude, longitude, data[0])
+        return render_template('cityData.html', city=city, state=state, country=country, quip=get_city_data_quip())
 
     @app.route('/login', methods=['POST'])
     def login():
@@ -355,10 +364,74 @@ def create_app():
             
     @app.route('/renderFavorites', methods=['GET'])
     def render_favorites():
+        '''
+        Render favorite locations list.
+        Returns:
+            JSON response with rendered HTML for favorite locations.
+        '''
+
         user = get_auth_user(request)
         html = render_template("favoriteLocations.html", user=user)
         return jsonify({"html": html})
     
+    def get_city_info(city, state, country):
+        '''
+        Get city information dictionary.
+        Args:
+            city (str): City name.
+            state (str): State name.
+            country (str): Country name.
+        Returns:
+            The rendered cityData.html template with weather data or a redirect to index with an error message.
+        '''
+
+        data = api.query_location(city, state, country)
+        if data is None:
+            # flash('Location not found. Please try again.', 'error')
+            print("data is none!!!")
+            return render_template('invalid_location.html', weather_data={}), 204
+        
+        for location in data:
+            if location['name'] == city:
+                data = [location]
+                break
+
+        if len(data) > 1:
+            return render_template('selectLocation.html', locations=data), 201
+        
+        longitude = data[0]['lon']
+        latitude = data[0]['lat']
+        
+        return query_hourly_forecast(latitude, longitude, data[0])
+
+    @app.route('/getQuip', methods=['GET'])
+    def getQuip():
+        '''
+        Render a random quip about city data.
+        Returns:
+            JSON response with the quip string.
+        '''
+
+        html = render_template("quip.html", quip=get_city_data_quip())
+        return jsonify({"html": html})
+
+    @app.route('/renderWeather', methods=['POST'])
+    def renderWeather():
+        '''
+        Render weather data grid.
+        Expects JSON data with 'weather_data' key.
+        Returns:
+            JSON response with rendered HTML for weather data grid.
+        '''
+
+        if request.json: 
+            if 'latitude' in request.json and request.json['latitude']:
+                html, status = query_hourly_forecast(request.json['latitude'], request.json['longitude'])
+            elif 'city' in request.json and request.json['city']:
+                html, status = get_city_info(request.json['city'], request.json.get('state'), request.json['country'])
+
+        return jsonify({"html": html, "status": status})
+
     # Register global template functions so they can be used in Jinja2 templates
     app.jinja_env.globals['get_auth_user_name'] = get_auth_user_name
     app.jinja_env.globals['get_auth_user_id'] = get_auth_user_id
