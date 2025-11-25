@@ -11,48 +11,37 @@ Handles the display of multiple location options
 for user selection when multiple matches are found.
 -->
 
-{% extends "base.html" %}
-{% block title %}Select Location - GoldenHour{% endblock %}
+<h3 class="centered">Please Select The Location You Are Looking For</h3>
+<div class="favorite-grid">  
+    <h4 class="centered">Latitude</h4>
+    <h4 class="centered">Longitude</h4>
+    <h4 class="centered">City</h4>
+    <h4 class="centered">State</h4>
+    <h4 class="centered">Country</h4>
+    <h4 class="centered">Action</h4>
+</div>
+<hr width="99%"/>
+{% if locations %}
+    {% for loc in locations %}
+        <div class="favorite-grid">
+          <p class="centered">{{ "{:.4f}".format(loc['lat']) }}</p>
+          <p class="centered">{{ "{:.4f}".format(loc['lon']) }}</p>
+          <p class="centered">{{ loc['name'] }} </p> 
+          <p class="centered">{{ loc['state'] if loc['state'] else "" }}</p>
+          <p class="centered">{{ loc['country'] }}</p>
+          <div class="centered">
+            <p type='hidden' name='latitude' value='{{ loc["lat"] }}'/>
+            <p type='hidden' name='longitude' value='{{ loc["lon"] }}'/>
+            <button onclick="loadCityWeatherData('{{ url_for("renderWeather") }}', '{{ loc["lat"] }}', '{{ loc["lon"] }}', '{{ loc["name"] }}', '{{ loc["state"] if loc["state"] else "" }}', '{{ loc["country"] }}', 'weather')">View</button>
+          </div> 
+        </div> 
+    {% endfor %}
+{% else %}
+  <p>No favorite locations saved.</p>
+{% endif %}
 
-{% block content %}
-    <section class="hero">
-      <h3 class="centered">Please Select The Location You Are Looking For</h3>
-          <div class="favorite-grid">  
-              <h4 class="centered">Latitude</h4>
-              <h4 class="centered">Longitude</h4>
-              <h4 class="centered">City</h4>
-              <h4 class="centered">State</h4>
-              <h4 class="centered">Country</h4>
-              <h4 class="centered">Action</h4>
-          </div>
-          <hr width="99%"/>
-          {% if locations %}
-              {% for loc in locations %}
-                  <div class="favorite-grid">
-                    <p class="centered">{{ "{:.4f}".format(loc['lat']) }}</p>
-                    <p class="centered">{{ "{:.4f}".format(loc['lon']) }}</p>
-                    <p class="centered">{{ loc['name'] }} </p> 
-                    <p class="centered">{{ loc['state'] if loc['state'] else "" }}</p>
-                    <p class="centered">{{ loc['country'] }}</p>
-                    <form action='/submitCoord' method='post' class="centered">
-                      <input type='hidden' name='latitude' value='{{ loc['lat'] }}'/>
-                      <input type='hidden' name='longitude' value='{{ loc['lon'] }}'/>
-                      <button type='submit'>View</button>
-                    </form>
-                  </div> 
-              {% endfor %}
-          {% else %}
-            <p>No favorite locations saved.</p>
-          {% endif %}
-    </section>
-    <br>
-    <button id="back">Go Back</button>
-{% endblock %}
-
-{% block scripts %}
-  <script>
-    document.querySelector('#back').addEventListener('click', function() {
-      window.location.href = "{{ url_for('index') }}";
-    });
-  </script>
-{% endblock %}
+<script>
+  document.querySelector('#back').addEventListener('click', function() {
+    window.location.href = "{{ url_for('index') }}";
+  });
+</script>
