@@ -134,10 +134,10 @@ async function loadCityWeatherData(url, lat, lon, city, state, country, targetEl
     
     let count = 0;
     let htmlData = null;
-    const minWaitTime = 2000;
+    const minWaitTime = 500;
     
     while (((performance.now() - startTime) < minWaitTime) || htmlData == null) {
-        await new Promise(resolve => setTimeout(resolve, 200));
+        await new Promise(resolve => setTimeout(resolve, 100));
         const randomIndex = Math.floor(Math.random() * weatherUnicode.length);
         document.getElementById('ticker').innerText += weatherUnicode[randomIndex];
         count += 1;
