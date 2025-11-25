@@ -203,8 +203,13 @@ class GoldenHourData:
             json_data (dict): The JSON data structure from the weather API,
                 containing city info and hourly forecast list.
         """
+ 
         self.city_name = json_data['city']['name']
-        self.coordinates = (json_data['city']['coord']['lat'], json_data['city']['coord']['lon'])
+        if 'lat' in json_data['city']['coord']:
+            self.coordinates = (json_data['city']['coord']['lat'], json_data['city']['coord']['lon'])
+        else:
+            self.coordinates = (0, 0)
+
         self.country = json_data['city']['country']
         self.timezone = json_data['city']['timezone']
         self.sunrise = json_data['city']['sunrise']
@@ -222,15 +227,11 @@ class GoldenHourData:
             if sunrise_hour < datetime.datetime.now().timestamp() and sunrise is None:
                 data = api.query_historical_forecast(self.coordinates[0], self.coordinates[1], sunrise_hour)
                 sunrise = data
-            elif sunrise is not None:
-                sunrise = sunrise
             
             sunset = next(filter(lambda x: x['dt'] == sunset_hour, json_data['list']), None)
             if sunset_hour < datetime.datetime.now().timestamp() and sunset is None:
                 data = api.query_historical_forecast(self.coordinates[0], self.coordinates[1], sunset_hour)
                 sunset = data
-            elif sunset is not None:
-                sunset = sunset
 
             if sunrise == None and sunset == None and len(self.days) > 0:
                 break
