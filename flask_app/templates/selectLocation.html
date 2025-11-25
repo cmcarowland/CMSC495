@@ -29,11 +29,9 @@ for user selection when multiple matches are found.
           <p class="centered">{{ loc['name'] }} </p> 
           <p class="centered">{{ loc['state'] if loc['state'] else "" }}</p>
           <p class="centered">{{ loc['country'] }}</p>
-          <div class="centered">
-            <p type='hidden' name='latitude' value='{{ loc["lat"] }}'/>
-            <p type='hidden' name='longitude' value='{{ loc["lon"] }}'/>
+          <div class="centered-div">
             <button onclick="loadCityWeatherData('{{ url_for("renderWeather") }}', '{{ loc["lat"] }}', '{{ loc["lon"] }}', '{{ loc["name"] }}', '{{ loc["state"] if loc["state"] else "" }}', '{{ loc["country"] }}', 'weather')">View</button>
-          </div> 
+          </div>
         </div> 
     {% endfor %}
 {% else %}
