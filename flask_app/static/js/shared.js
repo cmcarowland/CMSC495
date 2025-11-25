@@ -82,3 +82,80 @@ async function updateFavorites(url, lat, lon, name, state, country) {
         console.error("Error:", err);
     }
 }
+
+/*
+Function to fetch and display a quip in a target HTML element.
+Parameters:
+- targetElementId: The ID of the HTML element to display the quip.
+*/
+async function getQuip(targetElementId) {
+    try {
+        const response = await fetch("/getQuip");
+        const data = await response.json();
+        document.getElementById(targetElementId).innerHTML = data.html;
+    } catch (err) {
+        console.error("Error fetching quip:", err);
+    }
+}
+
+/*
+Function to load city weather data with a loading animation.
+Parameters:
+- url: The endpoint URL to fetch weather data from.
+- lat: Latitude of the location.
+- lon: Longitude of the location.
+- city: Name of the city.
+- state: State of the location.
+- country: Country of the location.
+- targetElementId: The ID of the HTML element to display the weather data.
+*/
+async function loadCityWeatherData(url, lat, lon, city, state, country, targetElementId) {
+    await getQuip(targetElementId);
+    const weatherUnicode = [
+        "\u26C5", "\u2614", "\u26A1", "\u26C4", "\u2746", "\u{1f308}"
+    ];
+
+    const startTime = performance.now();
+    
+    // Start the fetch without awaiting
+    const fetchPromise = fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            latitude: lat,
+            longitude: lon,
+            city: city,
+            state: state,
+            country: country
+        })
+    }).then(res => res.json());
+    
+    let count = 0;
+    let htmlData = null;
+    const minWaitTime = 2000;
+    
+    while (((performance.now() - startTime) < minWaitTime) || htmlData == null) {
+        await new Promise(resolve => setTimeout(resolve, 200));
+        const randomIndex = Math.floor(Math.random() * weatherUnicode.length);
+        document.getElementById('ticker').innerText += weatherUnicode[randomIndex];
+        count += 1;
+        if (count > 10) {
+            document.getElementById('ticker').innerText = '';
+            count = 0;
+        }
+        
+        // Check if fetch is complete
+        htmlData = await Promise.race([
+            fetchPromise,
+            new Promise(resolve => setTimeout(() => resolve(null), 0))
+        ]);
+    }
+    
+    if (htmlData.status === 204) {
+        document.getElementById(targetElementId).classList.add('error');
+    }
+
+    document.getElementById(targetElementId).innerHTML = htmlData.html;
+}
