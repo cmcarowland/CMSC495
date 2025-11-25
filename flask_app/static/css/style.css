@@ -119,6 +119,14 @@ footer{
   height: 100%;
 }
 
+.centered-div{
+  display:flex;
+  justify-content: center;
+  align-items: center;
+  height: 100%;
+  margin: 16px 0px;
+}
+
 .golden {
   color: var(--golden);
 }
