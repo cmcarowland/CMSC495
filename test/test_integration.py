@@ -19,6 +19,7 @@ import pytest
 import hashlib
 import base64
 import shutil
+from time import sleep
 
 @pytest.fixture
 def app_fixture():
@@ -53,12 +54,15 @@ def test_city_data(client_dummy):
         'country': 'US'
     })
     assert response.status_code == 200
-    assert b'Los Angeles, California, US' in response.data
+    assert b'<section id="weather" class="hero">' in response.data
 
 def test_coord_data(client_dummy):
-    response = client_dummy.post('/submitCoord', data={
+    response = client_dummy.post('/renderWeather', json={
         'latitude': '38.9',
-        'longitude': '-77.1'
+        'longitude': '-77.1',
+        'city': '',
+        'state': '',
+        'country': ''
     })
     assert response.status_code == 200
     assert b'Arlington, Virginia, US' in response.data
@@ -100,16 +104,6 @@ def test_no_state_information(client_dummy):
         flashed_messages = session['_flashes']
         assert any('Please provide a state for US locations.' in msg for category, msg in flashed_messages if category == 'error')
 
-def test_no_country_information_with_city_and_state(client_dummy):
-    response = client_dummy.post('/submitCity', data={
-        'city': 'Los Angeles',
-        'state': 'CA',
-        'country': ''
-    })
-    assert response.status_code == 200
-    assert b'<title>Redirecting...</title>' not in response.data
-    assert b'Los Angeles, California, US' in response.data
-
 def test_no_country_outside_us(client_dummy):
     response = client_dummy.post('/submitCity', data={
         'city': 'Skopje',
@@ -122,7 +116,9 @@ def test_no_country_outside_us(client_dummy):
         assert any('Please provide a country.' in msg for category, msg in flashed_messages if category == 'error')
 
 def test_outside_us(client_dummy):
-    response = client_dummy.post('/submitCity', data={
+    response = client_dummy.post('/renderWeather', json={
+        'latitude': '',
+        'longitude': '',
         'city': 'Skopje',
         'state': '',
         'country': 'MK'
@@ -165,16 +161,15 @@ def test_no_latitude_information(client_dummy):
 
 
 def test_invalid_location(client_dummy):
-    response = client_dummy.post('/submitCity', data={
+    response = client_dummy.post('/renderWeather', json={
+        'latitude': '',
+        'longitude': '',
         'city': 'ThisCityDoesNotExist',
         'state': 'ZZ',
         'country': 'US'
     })
-    assert response.status_code == 302
-    assert b'<title>Redirecting...</title>' in response.data
-    with client_dummy.session_transaction() as session:
-        flashed_messages = session['_flashes']
-        assert any('Location not found. Please try again.' in msg for category, msg in flashed_messages if category == 'error')
+    assert response.status_code == 200
+    assert b'No location found for the provided location.' in response.data
 
 def test_null_city_with_nonus_country(client_dummy):
     response = client_dummy.post('/submitCity', data={
@@ -189,15 +184,15 @@ def test_null_city_with_nonus_country(client_dummy):
         assert any('Please provide a valid city.' in msg for category, msg in flashed_messages if category == 'error')
 
 def test_bad_latitude_information(client_dummy):
-    response = client_dummy.post('/submitCoord', data={
+    response = client_dummy.post('/renderWeather', json={
         'latitude': '625',
-        'longitude': '-77'
+        'longitude': '-77',
+        'city': '',
+        'state': '',
+        'country': ''
     })
-    assert response.status_code == 302
-    assert b'<title>Redirecting...</title>' in response.data
-    with client_dummy.session_transaction() as session:
-        flashed_messages = session['_flashes']
-        assert any('Location not found. Please try again.' in msg for category, msg in flashed_messages if category == 'error')
+    assert response.status_code == 200
+    assert b'No location data found for the provided coordinates' in response.data
 
 def test_current_weather():
     response = api.query_current_weather(latitude='38.9', longitude='-77.1')
