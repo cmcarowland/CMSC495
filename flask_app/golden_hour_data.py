@@ -82,6 +82,11 @@ class EventData:
         Returns:
             float: The interpolated value between v0 and v1.
         """
+        if t < 0:
+            return v0
+        if t > 1:
+            return v1
+
         return v0 + t * (v1 - v0)
 
     def get_image_name(self):
