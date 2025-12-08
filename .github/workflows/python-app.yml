@@ -25,12 +25,12 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         chmod +x ./install.sh
-        ./install.sh $OPEN_WEATHER_MAP_API_KEY
+        source ./install.sh $OPEN_WEATHER_MAP_API_KEY
     - name: Test with pytest
       run: |
         ls -lisa
         pwd
-        source ./venv/bin/activate
+        # source ./venv/bin/activate
         echo "Running tests..."
         python -m pytest -v .
 
