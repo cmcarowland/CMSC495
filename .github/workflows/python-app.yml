@@ -28,6 +28,7 @@ jobs:
         ./install.sh $OPEN_WEATHER_MAP_API_KEY
     - name: Test with pytest
       run: |
+        source ./venv/bin/activate
         echo "Running tests..."
         pwd
         ls -lisa
