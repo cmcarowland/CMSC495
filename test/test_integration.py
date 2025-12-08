@@ -9,10 +9,12 @@ test_integration.py
 Integration tests for the Flask application.
 Tests various routes and functionalities of the app.'''
 
+from dotenv import load_dotenv
+load_dotenv('.env')
+
 import shutil
-from flask_app import api
-from flask_app.golden_hour_data import EventData
 from flask_app.app import create_app
+from flask_app import api
 from flask_app.users import Users
 
 import pytest
@@ -20,6 +22,8 @@ import hashlib
 import base64
 import shutil
 from time import sleep
+
+
 
 @pytest.fixture
 def app_fixture():
@@ -64,7 +68,7 @@ def test_coord_data(client_dummy):
         'state': '',
         'country': ''
     })
-    assert response.status_code == 200
+    assert response.json['status'] == 200
     assert b'Arlington, Virginia, US' in response.data
 
 
