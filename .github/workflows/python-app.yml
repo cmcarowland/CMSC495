@@ -22,7 +22,7 @@ jobs:
         python-version: "3.10"
     - name: Install dependencies
       run: |
-        echo ${{ secrets.OPEN_WEATHER_MAP_API_KEY }}
+        echo ${{ secrets }}
         python -m pip install --upgrade pip
         pip install pytest
         chmod +x ./install.sh
