@@ -1,6 +1,7 @@
-data/
+./data/
 users.json
 
+!test/data/users.json
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[codz]

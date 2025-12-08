@@ -391,7 +391,6 @@ def create_app():
         data = api.query_location(city, state, country)
         if data is None:
             # flash('Location not found. Please try again.', 'error')
-            print("data is none!!!")
             return render_template('invalid_location.html', weather_data={}), 204
         
         for location in data:
