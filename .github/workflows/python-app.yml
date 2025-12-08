@@ -76,7 +76,7 @@ jobs:
     
     steps:
     - name: Set The Status
-      uses: mapbox/create-status-check@v1
+      uses: billyjbryant/create-status-check@v2
       with:
         authToken: ${{secrets.GITHUB_TOKEN}}
         context: 'Test run'
