@@ -1,0 +1,6 @@
+[project]
+name="GoldenHour"
+version="0.0.1"
+
+[tool.setuptools.packages.find]
+include = ['flask_app']
