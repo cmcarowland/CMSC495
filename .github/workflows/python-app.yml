@@ -27,7 +27,7 @@ jobs:
         python -m pip install --upgrade pip
         pip install pytest
         chmod +x ./install.sh
-        source ./install.sh "$OPEN_WEATHER_MAP_API_KEY"
+        source ./install.sh "asdfsdaf"
     - name: Test with pytest
       run: |
         ls -lisa
