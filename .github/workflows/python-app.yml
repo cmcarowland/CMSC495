@@ -33,7 +33,7 @@ jobs:
       run: |
         ls -lisa
         pwd
-        source ./venv/bin/activate
+        
         echo "Running tests..."
         python -m pytest -v .
 
