@@ -441,3 +441,10 @@ def create_app():
 
 
 app_instance = create_app()
+
+def run():
+    """
+    Run the Flask application.
+    """
+
+    app_instance.run()
